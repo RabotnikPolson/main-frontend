@@ -1,0 +1,118 @@
+/* ===== Общая сетка ===== */
+.watch {
+  display: flex;
+  justify-content: center;
+  background: #0f0f0f;
+  padding-top: 24px;
+  min-height: 100vh;
+}
+
+.watch-grid {
+  display: grid;
+  grid-template-columns:  minmax(720px, 1280px)  420px;
+  gap: 24px;
+  width: 100%;
+  max-width: 1720px;
+  padding: 0 24px;
+}
+
+/* ===== Плеер ===== */
+.watch-player {
+  width: 100%;
+  background: #181818;
+  border: 1px solid #2b2b2b;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.watch-player-inner {
+  width: 100%;
+  background: black;
+}
+
+.watch-video {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  display: block;
+}
+
+/* Надпись под плеером */
+.watch-player-caption {
+  padding: 12px 16px;
+  font-size: 15px;
+  color: #e5e5e5;
+}
+
+/* ===== Заголовок и описание ===== */
+.watch-title {
+  margin-top: 16px;
+  font-size: 26px;
+  font-weight: 600;
+  color: white;
+}
+
+.watch-meta {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.watch-description {
+  color: #aaa;
+  margin-top: 16px;
+  font-size: 15px;
+  line-height: 1.45;
+  max-width: 90%;
+}
+
+/* ===== Боковая колонка ===== */
+.watch-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ===== Карточки ===== */
+.card {
+  background: #181818;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #2b2b2b;
+  margin-top: 24px;
+}
+
+.section {
+  margin-top: 32px;
+}
+
+.section-title {
+  color: white;
+  font-size: 20px;
+}
+
+/* Комментарии */
+.muted {
+  color: #777;
+  font-size: 14px;
+}
+
+.btn {
+  background: #272727;
+  color: white;
+  border: 1px solid #3a3a3a;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #3a3a3a;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  padding: 6px 8px;
+}

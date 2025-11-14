@@ -1,0 +1,14 @@
+/* src/styles/pages/Auth.css */
+.auth-page { max-width: 420px; }
+.auth-page h1 { color: var(--text); margin-bottom: 12px; }
+.auth-form { display: grid; gap: 10px; }
+.auth-form .input {
+  background: var(--bg); color: var(--text); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 12px;
+}
+.auth-form .button {
+  padding: 10px 16px; border-radius: var(--radius);
+  background: var(--primary); color: var(--primary-contrast);
+  border: 1px solid var(--primary); cursor: pointer;
+}
+.auth-switch { margin-top: 12px; color: var(--muted); }

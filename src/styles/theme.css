@@ -1,0 +1,14 @@
+/* src/styles/theme.css */
+:root{--radius:10px;--shadow-1:0 8px 24px rgba(0,0,0,.3);}
+:root[data-theme="dark"]{
+  --bg:#0f0f0f;--bg-elev:#161616;--tile:#1e1e1e;--tile-hover:#252525;
+  --text:#e9e9e9;--muted:#a3a3a3;--border:#2f2f2f;
+  --primary:#3b82f6;--primary-contrast:#0b1220;--danger:#ef4444;
+}
+:root[data-theme="light"]{
+  --bg:#ffffff;--bg-elev:#f7f7f8;--tile:#ffffff;--tile-hover:#f0f2f5;
+  --text:#0f172a;--muted:#6b7280;--border:#e5e7eb;
+  --primary:#2563eb;--primary-contrast:#ffffff;--danger:#dc2626;
+}
+html,body,#root{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);}

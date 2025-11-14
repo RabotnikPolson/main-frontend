@@ -1,0 +1,13 @@
+/* src/styles/pages/MovieDetails.css */
+.details-page .back-link { display: inline-block; margin-bottom: 12px; color: var(--primary); }
+.details-layout { display: grid; grid-template-columns: 360px 1fr; gap: 24px; }
+.details-poster { width: 100%; height: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+.actions { margin-top: 12px; display: flex; gap: 8px; }
+.details-info h2 { margin: 0 0 10px; color: var(--text); }
+.meta { margin-bottom: 8px; color: var(--text); }
+.description { white-space: pre-line; color: var(--text); }
+.more p { margin: 6px 0; color: var(--text); }
+
+@media (max-width: 900px) {
+  .details-layout { grid-template-columns: 1fr; }
+}
