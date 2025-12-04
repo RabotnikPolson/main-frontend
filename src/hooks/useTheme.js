@@ -1,22 +1,30 @@
 // src/hooks/useTheme.js
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from "react";
 
-const Ctx = createContext({ theme: 'dark', setTheme: () => {} });
+const Ctx = createContext({ theme: "dark", setTheme: () => {} });
 
 export function ThemeProvider({ children }) {
-  const system = typeof window !== 'undefined' &&
-    window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  const system =
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-color-scheme: light)").matches
+      ? "light"
+      : "dark";
 
   const [theme, setTheme] = useState(() => {
-    try { return localStorage.getItem('theme') || system; } catch { return system; }
+    try {
+      return localStorage.getItem("theme") || system;
+    } catch {
+      return system;
+    }
   });
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    try { localStorage.setItem('theme', theme); } catch {}
+    document.documentElement.setAttribute("data-theme", theme);
+    try {
+      localStorage.setItem("theme", theme);
+    } catch {}
   }, [theme]);
 
-  // без JSX
   return React.createElement(Ctx.Provider, { value: { theme, setTheme } }, children);
 }
 

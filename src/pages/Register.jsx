@@ -1,51 +1,80 @@
-// src/pages/Register.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import { register as apiRegister } from '../shared/api/auth';
-import { useAuth } from '../hooks/useAuth';
-import '../styles/pages/Auth.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { useAuth } from "../hooks/useAuth";
+import "../styles/pages/Auth.css";
 
 export default function Register() {
   const nav = useNavigate();
-  const { login } = useAuth();
-  const [form, setForm] = useState({ username: '', password: '' });
+  const { register } = useAuth();
 
-  const m = useMutation({
-    mutationFn: apiRegister,
-    onSuccess: (data) => {
-      const role = data.role || 'ROLE_USER';
-      login(data.token, data.username, role);
-      nav('/', { replace: true });
+  const [form, setForm] = useState({
+    email: "",
+    username: "",
+    password: "",
+  });
+
+  const mutation = useMutation({
+    mutationFn: (payload) => register(payload),
+    onSuccess: () => {
+      nav("/", { replace: true });
     },
   });
 
-  const submit = (e) => { e.preventDefault(); m.mutate(form); };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    mutation.mutate({ ...form });
+  };
 
   return (
     <div className="container auth-page">
       <h1>Регистрация</h1>
-      {m.error && <p className="error">{m.error.message}</p>}
-      <form onSubmit={submit} className="auth-form">
+
+      {mutation.isError && (
+        <p className="error">Не удалось создать аккаунт.</p>
+      )}
+
+      <form onSubmit={handleSubmit} className="auth-form">
         <input
           className="input"
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          autoComplete="email"
+          required
+        />
+        <input
+          className="input"
+          type="text"
+          name="username"
           placeholder="Логин"
           value={form.username}
-          onChange={(e)=>setForm({...form, username: e.target.value})}
+          onChange={handleChange}
           autoComplete="username"
+          minLength={3}
+          maxLength={50}
           required
         />
         <input
           className="input"
           type="password"
+          name="password"
           placeholder="Пароль"
           value={form.password}
-          onChange={(e)=>setForm({...form, password: e.target.value})}
+          onChange={handleChange}
           autoComplete="new-password"
+          minLength={6}
           required
         />
-        <button className="button" disabled={m.isLoading}>
-          {m.isLoading ? 'Создаём…' : 'Создать аккаунт'}
+        <button className="button" disabled={mutation.isLoading}>
+          {mutation.isLoading ? "Создаём…" : "Создать аккаунт"}
         </button>
       </form>
     </div>

@@ -1,75 +1,263 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import http from '../shared/api/http'; // <-- важно: ставим токен в defaults
+// src/hooks/useAuth.js
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
+
+import http from "../shared/api/http";
+import {
+  login as apiLogin,
+  register as apiRegister,
+  logout as apiLogout,
+  refresh as apiRefresh,
+} from "../shared/api/auth";
 
 const AuthContext = createContext(null);
 
+const LS_ACCESS = "accessToken";
+const LS_REFRESH = "refreshToken";
+const LS_USER = "authUser";
+
 function safeGet(key) {
-  try { return localStorage.getItem(key); } catch { return null; }
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
 }
+
 function safeSet(key, value) {
   try {
-    if (value === null) localStorage.removeItem(key);
-    else localStorage.setItem(key, value);
+    if (value === null || value === undefined) {
+      localStorage.removeItem(key);
+    } else {
+      localStorage.setItem(key, value);
+    }
   } catch {}
 }
-function readUserFromStorage() {
-  const token = safeGet('token');
-  const username = safeGet('username');
-  const role = safeGet('role');
-  return token && username ? { token, username, role } : null;
+
+function readAuthFromStorage() {
+  const accessToken = safeGet(LS_ACCESS);
+  const refreshToken = safeGet(LS_REFRESH);
+  const rawUser = safeGet(LS_USER);
+
+  let user = null;
+  if (rawUser) {
+    try {
+      user = JSON.parse(rawUser);
+    } catch {
+      user = null;
+    }
+  }
+
+  return {
+    accessToken: accessToken || null,
+    refreshToken: refreshToken || null,
+    user,
+  };
+}
+
+async function fetchProfileApi() {
+  const { data } = await http.get("/profile/me");
+  const username = data.nickname || data.username || data.email;
+  return {
+    username,
+    email: data.email,
+    avatarUrl: data.avatarUrl || null,
+    raw: data,
+  };
 }
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => readUserFromStorage());
+  const [{ user, accessToken, refreshToken }, setAuthState] = useState(
+    () => readAuthFromStorage()
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // при монтировании — если есть token в storage, уже выставлен в http (см http.js)
   useEffect(() => {
-    const onStorage = (e) => {
-      if (!e.key) { setUser(readUserFromStorage()); return; }
-      if (['token','username','role'].includes(e.key)) setUser(readUserFromStorage());
-    };
-    const onLogin = () => setUser(readUserFromStorage());
-    const onLogout = () => setUser(null);
+    if (accessToken) {
+      http.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+    } else {
+      try {
+        delete http.defaults.headers.common.Authorization;
+      } catch {}
+    }
+  }, [accessToken]);
 
-    window.addEventListener('storage', onStorage);
-    window.addEventListener('app:login', onLogin);
-    window.addEventListener('app:logout', onLogout);
-    return () => {
-      window.removeEventListener('storage', onStorage);
-      window.removeEventListener('app:login', onLogin);
-      window.removeEventListener('app:logout', onLogout);
-    };
+  const writeAuth = useCallback((next) => {
+    if (!next || !next.accessToken || !next.user) {
+      safeSet(LS_ACCESS, null);
+      safeSet(LS_REFRESH, null);
+      safeSet(LS_USER, null);
+      setAuthState({ user: null, accessToken: null, refreshToken: null });
+      return;
+    }
+
+    safeSet(LS_ACCESS, next.accessToken);
+    safeSet(LS_REFRESH, next.refreshToken || "");
+    safeSet(LS_USER, JSON.stringify(next.user));
+
+    setAuthState({
+      user: next.user,
+      accessToken: next.accessToken,
+      refreshToken: next.refreshToken || null,
+    });
   }, []);
 
-  const login = (token, username, role='ROLE_USER') => {
-    safeSet('token', token);
-    safeSet('username', username);
-    safeSet('role', role);
+  const loadProfileWithToken = useCallback(
+    async (tokens) => {
+      const { accessToken: at, refreshToken: rt } = tokens;
 
-    // обязательно сразу сфиксить в axios defaults — избегаем гонки
-    try { http.defaults.headers.common.Authorization = `Bearer ${token}`; } catch (e) { /* ignore */ }
+      safeSet(LS_ACCESS, at);
+      http.defaults.headers.common["Authorization"] = `Bearer ${at}`;
 
-    setUser({ token, username, role });
-    try { window.dispatchEvent(new CustomEvent('app:login', { detail: { username, role } })); } catch {}
+      const profile = await fetchProfileApi();
+
+      const userObj = {
+        username: profile.username,
+        email: profile.email,
+        avatarUrl: profile.avatarUrl,
+        profile: profile.raw,
+      };
+
+      writeAuth({
+        user: userObj,
+        accessToken: at,
+        refreshToken: rt || null,
+      });
+
+      try {
+        window.dispatchEvent(
+          new CustomEvent("app:login", {
+            detail: { username: userObj.username },
+          })
+        );
+      } catch {}
+
+      return userObj;
+    },
+    [writeAuth]
+  );
+
+  const login = useCallback(
+    async ({ email, password }) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await apiLogin({ email, password });
+        await loadProfileWithToken({
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+        });
+      } catch (e) {
+        setError(e);
+        throw e;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [loadProfileWithToken]
+  );
+
+  const register = useCallback(
+    async ({ email, username, password }) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await apiRegister({ email, username, password });
+        await loadProfileWithToken({
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+        });
+      } catch (e) {
+        setError(e);
+        throw e;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [loadProfileWithToken]
+  );
+
+  const logout = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await apiLogout();
+    } catch {} finally {
+      setIsLoading(false);
+    }
+
+    writeAuth(null);
+
+    try {
+      window.dispatchEvent(new CustomEvent("app:logout"));
+    } catch {}
+  }, [writeAuth]);
+
+  const refresh = useCallback(async () => {
+    if (!refreshToken) return;
+    try {
+      const res = await apiRefresh(refreshToken);
+      writeAuth({
+        user,
+        accessToken: res.accessToken,
+        refreshToken: res.refreshToken,
+      });
+    } catch (e) {
+      await logout();
+    }
+  }, [refreshToken, user, writeAuth, logout]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.key || [LS_ACCESS, LS_REFRESH, LS_USER].includes(e.key)) {
+        const next = readAuthFromStorage();
+        setAuthState(next);
+
+        if (!next.user) {
+          try {
+            window.dispatchEvent(new CustomEvent("app:logout"));
+          } catch {}
+        } else {
+          try {
+            window.dispatchEvent(
+              new CustomEvent("app:login", {
+                detail: { username: next.user.username },
+              })
+            );
+          } catch {}
+        }
+      }
+    };
+
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
+  }, []);
+
+  const value = {
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    error,
+    login,
+    register,
+    logout,
+    refresh,
   };
 
-  const logout = () => {
-    safeSet('token', null);
-    safeSet('username', null);
-    safeSet('role', null);
-
-    // убрать заголовок из defaults
-    try { delete http.defaults.headers.common.Authorization; } catch (e) { /* ignore */ }
-
-    setUser(null);
-    try { window.dispatchEvent(new CustomEvent('app:logout')); } catch {}
-  };
-
-  return React.createElement(AuthContext.Provider, { value: { user, login, logout } }, children);
+  // БЕЗ JSX: чистый JS
+  return React.createElement(AuthContext.Provider, { value }, children);
 }
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
+  if (!ctx) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
   return ctx;
 }

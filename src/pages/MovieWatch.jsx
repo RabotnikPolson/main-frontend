@@ -1,10 +1,8 @@
-// src/pages/MovieWatch.jsx
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import Hls from "hls.js";
 import http from "../shared/api/http";
 
-import RatingStars from "../components/RatingStars";
 import ReviewCard from "../components/ReviewCard";
 import ReviewFormModal from "../components/ReviewFormModal";
 import CommentsSection from "../components/Comments/CommentsSection";
@@ -18,9 +16,6 @@ import {
   useReactReview,
 } from "../hooks/useReviews";
 
-/* ===========================
-   ПЛЕЕР (адаптирован под CSS)
-   =========================== */
 function MoviePlayer({ streamUrl, title }) {
   const videoRef = useRef(null);
 
@@ -46,30 +41,24 @@ function MoviePlayer({ streamUrl, title }) {
       <div className="watch-player-inner">
         <video ref={videoRef} className="watch-video" controls />
       </div>
-
       {title && <div className="watch-player-caption">{title}</div>}
     </div>
   );
 }
 
-/* ===========================
-   ОСНОВНАЯ СТРАНИЦА
-   =========================== */
 export default function MovieWatch() {
   const { imdbId } = useParams();
   const [movie, setMovie] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  // грузим DTO для Watch Page
   useEffect(() => {
     http
-      .get(`/api/movies/imdb/${imdbId}/watch`)
-      .then((r) => setMovie(r.data))
+      .get(`/movies/imdb/${imdbId}/watch`)
+      .then(r => setMovie(r.data))
       .catch(() => setMovie(null));
   }, [imdbId]);
 
-  // фикс пути к HLS
   const fullStreamUrl =
     movie?.streamUrl && !movie.streamUrl.startsWith("http")
       ? `http://localhost:8080${movie.streamUrl}`
@@ -79,36 +68,30 @@ export default function MovieWatch() {
   const { create, update } = useCreateOrUpdateReview(imdbId);
   const reactReview = useReactReview(imdbId);
 
-  const userReview = reviews?.items?.find((r) => r.isOwner);
+  const userReview = reviews?.items?.find(r => r.isOwner);
 
-  const submitReview = async (payload) => {
+  const submitReview = async payload => {
     if (editing) {
       await update.mutateAsync({ id: editing.id, payload });
     } else {
       await create.mutateAsync({ imdbId, ...payload });
     }
-
-    // обновляем страницу
-    window.location.reload();
+    setModalOpen(false);
+    setEditing(null);
   };
 
   return (
     <div className="watch">
       <div className="watch-grid">
-
-        {/* ======= ЛЕВАЯ КОЛОНКА ======= */}
         <div className="watch-main">
-
           <MoviePlayer streamUrl={fullStreamUrl} title={movie?.title} />
 
           <h1 className="watch-title">{movie?.title}</h1>
 
-          {/* Отзыв текущего юзера */}
           {userReview ? (
             <div className="card">
               <h3 className="section-title">Ваш отзыв</h3>
               <ReviewCard review={userReview} isOwner />
-
               <button
                 className="btn"
                 onClick={() => {
@@ -131,10 +114,9 @@ export default function MovieWatch() {
             </button>
           )}
 
-          {/* Все отзывы */}
           <div className="section">
             <h3 className="section-title">Отзывы</h3>
-            {(reviews?.items || []).map((r) => (
+            {(reviews?.items || []).map(r => (
               <ReviewCard
                 key={r.id}
                 review={r}
@@ -146,14 +128,12 @@ export default function MovieWatch() {
             ))}
           </div>
 
-          {/* Комментарии */}
           <div className="section card">
             <h3 className="section-title">Комментарии</h3>
             <CommentsSection imdbId={imdbId} />
           </div>
         </div>
 
-        {/* ======= ПРАВАЯ КОЛОНКА ======= */}
         <div className="watch-sidebar">
           <RecommendationsRail imdbId={imdbId} />
         </div>

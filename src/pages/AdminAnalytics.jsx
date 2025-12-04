@@ -1,7 +1,6 @@
-// src/pages/AdminAnalytics.jsx
-import React, { useEffect, useState } from 'react';
-import http from '../shared/api/http';
-import '../styles/pages/AdminAnalytics.css';
+import React, { useEffect, useState } from "react";
+import http from "../shared/api/http";
+import "../styles/pages/AdminAnalytics.css";
 
 export default function AdminAnalytics() {
   const [data, setData] = useState([]);
@@ -9,14 +8,25 @@ export default function AdminAnalytics() {
 
   useEffect(() => {
     let mounted = true;
-    http.get('/api/admin/analytics/daily')
+
+    http
+      .get("/admin/analytics/daily")
       .then(r => mounted && setData(r.data || []))
       .catch(() => mounted && setData([]))
       .finally(() => mounted && setLoading(false));
-    return () => { mounted = false; };
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  if (loading) return <div className="container analytics-page"><p>Загрузка…</p></div>;
+  if (loading) {
+    return (
+      <div className="container analytics-page">
+        <p>Загрузка…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container analytics-page">
@@ -24,7 +34,13 @@ export default function AdminAnalytics() {
       <div className="table-wrap">
         <table className="analytics-table">
           <thead>
-            <tr><th>userId</th><th>date</th><th>plays</th><th>likes</th><th>shares</th></tr>
+            <tr>
+              <th>userId</th>
+              <th>date</th>
+              <th>plays</th>
+              <th>likes</th>
+              <th>shares</th>
+            </tr>
           </thead>
           <tbody>
             {data.map(d => (

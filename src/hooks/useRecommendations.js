@@ -1,3 +1,4 @@
+// src/hooks/useRightRail.js
 import { useQuery } from "@tanstack/react-query";
 import { listRightRail } from "../shared/api/recommendations";
 

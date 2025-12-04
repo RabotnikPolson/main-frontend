@@ -5,34 +5,35 @@ const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const http = axios.create({
   baseURL,
   timeout: 10000,
-  withCredentials: false
+  withCredentials: false,
 });
 
-// начальная установка токена
 try {
-  const t = localStorage.getItem("token");
-  if (t) http.defaults.headers.common["Authorization"] = `Bearer ${t}`;
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    http.defaults.headers.common.Authorization = `Bearer ${token}`;
+  }
 } catch {}
 
-// перехватчик запросов
 http.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-
+  config => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        config.headers = config.headers || {};
+        if (!config.headers.Authorization) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      }
+    } catch {}
     return config;
   },
-  (err) => Promise.reject(err)
+  err => Promise.reject(err)
 );
 
-// обработка ошибок
 http.interceptors.response.use(
-  (res) => res,
-  (err) => {
+  res => res,
+  err => {
     if (err?.response?.status === 401) {
       console.warn("[HTTP 401]:", err?.config?.url);
     }
