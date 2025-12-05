@@ -1,3 +1,4 @@
+// src/pages/MovieWatch.jsx
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import Hls from "hls.js";
@@ -47,34 +48,38 @@ function MoviePlayer({ streamUrl, title }) {
 }
 
 export default function MovieWatch() {
-  const { imdbId } = useParams();
+  const { id } = useParams();
+  const movieId = id ? Number(id) : null;
+
   const [movie, setMovie] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
   useEffect(() => {
+    if (!movieId) return;
     http
-      .get(`/movies/imdb/${imdbId}/watch`)
+      .get(`/movies/${movieId}`)
       .then(r => setMovie(r.data))
       .catch(() => setMovie(null));
-  }, [imdbId]);
+  }, [movieId]);
 
   const fullStreamUrl =
     movie?.streamUrl && !movie.streamUrl.startsWith("http")
       ? `http://localhost:8080${movie.streamUrl}`
       : movie?.streamUrl;
 
-  const { data: reviews } = useReviews(imdbId, 0, 10);
-  const { create, update } = useCreateOrUpdateReview(imdbId);
-  const reactReview = useReactReview(imdbId);
+  const { data: reviews } = useReviews(movieId, 0, 10);
+  const { create, update } = useCreateOrUpdateReview(movieId);
+  const reactReview = useReactReview(movieId);
 
   const userReview = reviews?.items?.find(r => r.isOwner);
 
   const submitReview = async payload => {
+    if (!movieId) return;
     if (editing) {
       await update.mutateAsync({ id: editing.id, payload });
     } else {
-      await create.mutateAsync({ imdbId, ...payload });
+      await create.mutateAsync({ movieId, ...payload });
     }
     setModalOpen(false);
     setEditing(null);
@@ -121,8 +126,8 @@ export default function MovieWatch() {
                 key={r.id}
                 review={r}
                 isOwner={r.isOwner}
-                onReact={(id, reaction) =>
-                  reactReview.mutate({ id, reaction })
+                onReact={(rid, reaction) =>
+                  reactReview.mutate({ id: rid, reaction })
                 }
               />
             ))}
@@ -130,13 +135,15 @@ export default function MovieWatch() {
 
           <div className="section card">
             <h3 className="section-title">Комментарии</h3>
-            <CommentsSection imdbId={imdbId} />
+            {movieId && <CommentsSection imdbId={movieId} />}
           </div>
         </div>
 
-        <div className="watch-sidebar">
-          <RecommendationsRail imdbId={imdbId} />
-        </div>
+        {movie?.imdbId && (
+          <div className="watch-sidebar">
+            <RecommendationsRail imdbId={movie.imdbId} />
+          </div>
+        )}
       </div>
 
       <ReviewFormModal

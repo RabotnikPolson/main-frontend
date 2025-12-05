@@ -48,9 +48,10 @@ export default function App() {
             <Route path="subscription" element={<SubscriptionPage />} />
 
             {/* Страницы фильмов */}
-            <Route path="movie/:imdbId" element={<MovieDetails />} />
-            <Route path="movie/:imdbId/watch" element={<MovieWatch />} />
-            <Route path="movie/:imdbId/reviews" element={<MovieReviews />} />
+            <Route path="movie/:id" element={<MovieDetails />} />
+            <Route path="movie/:id/watch" element={<MovieWatch />} />
+            <Route path="movie/:id/reviews" element={<MovieReviews />} />
+
 
             {/* Авторизация */}
             <Route path="login" element={<Login />} />
