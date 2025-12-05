@@ -1,72 +1,57 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useMovie } from "../hooks/useMovie";
 import { useAuth } from "../hooks/useAuth";
+import { useUserProfile } from "../hooks/useUserProfile";
 import {
-  getMyFavorites,
-  addFavoriteByImdb,
-  removeFavoriteByImdb,
+  getFavoritesByUser,
+  addFavorite,
+  removeFavorite,
 } from "../shared/api/favorites";
 import "../styles/pages/MovieDetails.css";
 
 export default function MovieDetails() {
-  const { imdbId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
-  const { data: movie, isLoading, isError, error } = useMovie(imdbId);
+  const qc = useQueryClient();
+
+  const { data: movie, isLoading, isError, error } = useMovie(id);
   const { user } = useAuth();
   const username = user?.username ?? null;
-  const qc = useQueryClient();
+  const { data: profile } = useUserProfile();
+  const userId = profile?.userId ?? null;
 
   const localKey = (u = "guest") => `favorites_${u}`;
 
-  const { data: remoteFavs = [] } = useQuery({
-    queryKey: ["favorites", username],
+  const {
+    data: remoteFavIds = [],
+    isLoading: favsLoading,
+  } = useQuery({
+    queryKey: ["favorites", userId],
     queryFn: async () => {
-      if (!username) return [];
-      const data = await getMyFavorites();
-      return Array.isArray(data)
-        ? data
-            .map(m => m.imdbId ?? m.imdbID ?? null)
-            .filter(Boolean)
-        : [];
+      if (!userId) return [];
+      const data = await getFavoritesByUser(userId);
+      return Array.isArray(data) ? data.map((w) => w.movieId) : [];
     },
-    enabled: !!username,
+    enabled: !!username && !!userId,
     staleTime: 30000,
   });
 
   const addMut = useMutation({
-    mutationFn: id => addFavoriteByImdb(id),
-    onMutate: async id => {
-      await qc.cancelQueries({ queryKey: ["favorites", username] });
-      const prev = qc.getQueryData(["favorites", username]) || [];
-      qc.setQueryData(["favorites", username], (old = []) =>
-        old.includes(id) ? old : [id, ...old]
-      );
-      return { prev };
-    },
-    onError: (_e, _id, ctx) => {
-      if (ctx?.prev) qc.setQueryData(["favorites", username], ctx.prev);
-    },
-    onSettled: () =>
-      qc.invalidateQueries({ queryKey: ["favorites", username] }),
+    mutationFn: (movieId) => addFavorite(userId, movieId),
+    onSuccess: () =>
+      qc.invalidateQueries({
+        queryKey: ["favorites", userId],
+      }),
   });
 
   const delMut = useMutation({
-    mutationFn: id => removeFavoriteByImdb(id),
-    onMutate: async id => {
-      await qc.cancelQueries({ queryKey: ["favorites", username] });
-      const prev = qc.getQueryData(["favorites", username]) || [];
-      qc.setQueryData(["favorites", username], (old = []) =>
-        old.filter(x => x !== id)
-      );
-      return { prev };
-    },
-    onError: (_e, _id, ctx) => {
-      if (ctx?.prev) qc.setQueryData(["favorites", username], ctx.prev);
-    },
-    onSettled: () =>
-      qc.invalidateQueries({ queryKey: ["favorites", username] }),
+    mutationFn: (movieId) => removeFavorite(userId, movieId),
+    onSuccess: () =>
+      qc.invalidateQueries({
+        queryKey: ["favorites", userId],
+      }),
   });
 
   const [localFavs, setLocalFavs] = useState(() => {
@@ -89,24 +74,27 @@ export default function MovieDetails() {
     if (movie) document.title = `${movie.title} — Cinema App`;
   }, [movie]);
 
-  const favs = username ? remoteFavs : localFavs;
-
-  const isFavorite = useMemo(
-    () => !!movie && favs.includes(movie.imdbId),
-    [movie, favs]
-  );
+  const favIds = username && userId ? remoteFavIds : localFavs;
+  const movieId = movie?.id ?? null;
+  const isFavorite = !!movieId && favIds.includes(movieId);
 
   const toggleFavorite = () => {
-    if (!movie) return;
-    const id = movie.imdbId;
+    if (!movieId) return;
 
-    if (username) {
-      return isFavorite ? delMut.mutate(id) : addMut.mutate(id);
+    if (username && userId) {
+      if (isFavorite) {
+        delMut.mutate(movieId);
+      } else {
+        addMut.mutate(movieId);
+      }
+      return;
     }
 
-    setLocalFavs(prev => {
-      const exists = prev.includes(id);
-      const updated = exists ? prev.filter(x => x !== id) : [id, ...prev];
+    setLocalFavs((prev) => {
+      const exists = prev.includes(movieId);
+      const updated = exists
+        ? prev.filter((x) => x !== movieId)
+        : [movieId, ...prev];
       try {
         localStorage.setItem(localKey(), JSON.stringify(updated));
       } catch {}
@@ -164,7 +152,7 @@ export default function MovieDetails() {
             src={posterSrc}
             alt={movie.title}
             loading="lazy"
-            onError={e => {
+            onError={(e) => {
               e.currentTarget.src =
                 "https://via.placeholder.com/400x600/333/fff?text=No+Image";
             }}
@@ -174,14 +162,14 @@ export default function MovieDetails() {
             <button
               className="button"
               onClick={toggleFavorite}
-              disabled={addMut.isLoading || delMut.isLoading}
+              disabled={addMut.isLoading || delMut.isLoading || favsLoading}
             >
               {isFavorite ? "✓ В избранном" : "Добавить в избранное"}
             </button>
 
             <button
               className="button button--ghost"
-              onClick={() => navigate(`/movie/${imdbId}/watch`)}
+              onClick={() => navigate(`/movie/${id}/watch`)}
             >
               ▶ Смотреть
             </button>

@@ -5,12 +5,12 @@ export const getAllMovies = async () => {
   return res.data;
 };
 
-export const getMovieByImdb = async imdbId => {
-  const res = await http.get(`/movies/imdb/${imdbId}`);
+export const getMovie = async (id) => {
+  const res = await http.get(`/movies/${id}`);
   return res.data;
 };
 
-export const addFromImdb = async imdbId => {
+export const addFromImdb = async (imdbId) => {
   const res = await http.post("/movies/addFromImdb", null, {
     params: { imdbId },
   });

@@ -2,48 +2,53 @@ import React, { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import MovieGrid from "../components/MovieGrid";
 import { useMovies } from "../hooks/useMovies";
-import {
-  getMyFavorites,
-  addFavoriteByImdb,
-  removeFavoriteByImdb,
-} from "../shared/api/favorites";
 import { useAuth } from "../hooks/useAuth";
+import { useUserProfile } from "../hooks/useUserProfile";
+import {
+  getFavoritesByUser,
+  addFavorite,
+  removeFavorite,
+} from "../shared/api/favorites";
 import "../styles/pages/Favorites.css";
 
 const localKey = (user = "guest") => `favorites_${user}`;
 
 export default function Favorites() {
-  const { data: movies = [] } = useMovies();
   const qc = useQueryClient();
+  const { data: movies = [] } = useMovies();
   const { user } = useAuth();
   const username = user?.username ?? null;
+  const { data: profile } = useUserProfile();
+  const userId = profile?.userId ?? null;
 
   const {
-    data: remoteFavs = [],
+    data: remoteFavsRaw = [],
     isLoading: favsLoading,
   } = useQuery({
-    queryKey: ["favorites", username],
+    queryKey: ["favorites", userId],
     queryFn: async () => {
-      if (!username) return [];
-      const data = await getMyFavorites();
-      return Array.isArray(data)
-        ? data
-            .map(m => m.imdbId ?? m.imdbID ?? null)
-            .filter(Boolean)
-        : [];
+      if (!userId) return [];
+      const data = await getFavoritesByUser(userId);
+      return Array.isArray(data) ? data.map((w) => w.movieId) : [];
     },
-    enabled: !!username,
+    enabled: !!username && !!userId,
     staleTime: 30000,
   });
 
   const addMut = useMutation({
-    mutationFn: imdbId => addFavoriteByImdb(imdbId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", username] }),
+    mutationFn: (movieId) => addFavorite(userId, movieId),
+    onSuccess: () =>
+      qc.invalidateQueries({
+        queryKey: ["favorites", userId],
+      }),
   });
 
   const delMut = useMutation({
-    mutationFn: imdbId => removeFavoriteByImdb(imdbId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", username] }),
+    mutationFn: (movieId) => removeFavorite(userId, movieId),
+    onSuccess: () =>
+      qc.invalidateQueries({
+        queryKey: ["favorites", userId],
+      }),
   });
 
   const [localFavs, setLocalFavs] = useState(() => {
@@ -62,29 +67,32 @@ export default function Favorites() {
     }
   }, [localFavs, username]);
 
-  const favs = username ? remoteFavs : localFavs;
-  const favMovies = movies.filter(m => favs.includes(m.imdbId));
+  const favIds = username && userId ? remoteFavsRaw : localFavs;
+  const favMovies = movies.filter((m) => favIds.includes(m.id));
 
-  const toggle = imdbId => {
-    if (username) {
-      if (remoteFavs.includes(imdbId)) {
-        delMut.mutate(imdbId);
+  const toggle = (movieId) => {
+    if (username && userId) {
+      if (remoteFavsRaw.includes(movieId)) {
+        delMut.mutate(movieId);
       } else {
-        addMut.mutate(imdbId);
+        addMut.mutate(movieId);
       }
-    } else {
-      setLocalFavs(prev =>
-        prev.includes(imdbId)
-          ? prev.filter(x => x !== imdbId)
-          : [imdbId, ...prev]
-      );
+      return;
     }
+
+    setLocalFavs((prev) =>
+      prev.includes(movieId)
+        ? prev.filter((x) => x !== movieId)
+        : [movieId, ...prev]
+    );
   };
 
   return (
     <div className="container favorites-page">
       <h1>Избранное</h1>
+
       {username && favsLoading && <div className="loading">Загрузка…</div>}
+
       {favMovies.length === 0 ? (
         <div className="empty">Пусто</div>
       ) : (

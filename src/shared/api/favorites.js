@@ -1,20 +1,21 @@
 import http from "./http";
 
-export const getMyFavorites = async () => {
-  const res = await http.get("/users/me/favorites");
+export const getFavoritesByUser = async (userId) => {
+  const res = await http.get(`/watchlists/user/${userId}`);
   return res.data;
 };
 
-export const addFavoriteByImdb = async imdbId => {
-  const res = await http.put(
-    `/users/me/favorites/${encodeURIComponent(imdbId)}`
-  );
+export const addFavorite = async (userId, movieId) => {
+  const res = await http.post("/watchlists", {
+    userId,
+    movieId,
+  });
   return res.data;
 };
 
-export const removeFavoriteByImdb = async imdbId => {
-  const res = await http.delete(
-    `/users/me/favorites/${encodeURIComponent(imdbId)}`
-  );
+export const removeFavorite = async (userId, movieId) => {
+  const res = await http.delete("/watchlists", {
+    params: { userId, movieId },
+  });
   return res.data;
 };

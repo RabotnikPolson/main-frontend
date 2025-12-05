@@ -16,7 +16,7 @@ try {
 } catch {}
 
 http.interceptors.request.use(
-  config => {
+  (config) => {
     try {
       const token = localStorage.getItem("accessToken");
       if (token) {
@@ -28,15 +28,30 @@ http.interceptors.request.use(
     } catch {}
     return config;
   },
-  err => Promise.reject(err)
+  (err) => Promise.reject(err)
 );
 
 http.interceptors.response.use(
-  res => res,
-  err => {
-    if (err?.response?.status === 401) {
-      console.warn("[HTTP 401]:", err?.config?.url);
+  (res) => res,
+  (err) => {
+    const status = err?.response?.status;
+
+    if (status === 401) {
+      try {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("authUser");
+        localStorage.setItem("app:logout", Date.now().toString());
+      } catch {}
+
+      try {
+        const path = window.location.pathname;
+        if (!path.startsWith("/login") && !path.startsWith("/register")) {
+          window.location.href = "/login?expired=1";
+        }
+      } catch {}
     }
+
     return Promise.reject(err);
   }
 );
