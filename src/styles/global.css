@@ -15,7 +15,12 @@ body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);
 .navlist{list-style:none;padding:0;margin:0}
 .navitem{display:block;padding:8px 10px;border-radius:8px;color:var(--muted);text-decoration:none}
 .navitem:hover{background:rgba(255,255,255,.02);color:var(--txt)}
-.movie-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* ровно 5 колонок */
+  gap: 20px;
+  justify-content: center; /* центрирует всю сетку, если контейнер шире */
+}
 .movie-card{text-decoration:none;color:inherit;background:var(--surface);border:1px solid rgba(255,255,255,.03);border-radius:10px;overflow:hidden}
 .movie-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .movie-meta{padding:8px 10px;display:flex;justify-content:space-between}
