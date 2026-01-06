@@ -1,4 +1,3 @@
-// src/pages/MovieWatch.jsx
 import { useRef, useEffect, useState } from "react";
 import Hls from "hls.js";
 
@@ -6,6 +5,7 @@ import ReviewCard from "../components/ReviewCard";
 import ReviewFormModal from "../components/ReviewFormModal";
 import CommentsSection from "../components/Comments/CommentsSection";
 import RecommendationsRail from "../components/RightRail/RecommendationsRail";
+import { useReviews, useCreateReview } from "../hooks/useReviews";
 
 import "../styles/pages/MovieWatch.css";
 
@@ -25,14 +25,7 @@ function MoviePlayer({ streamUrl, title }) {
       const hls = new Hls();
       hls.loadSource(streamUrl);
       hls.attachMedia(video);
-
-      hls.on(Hls.Events.ERROR, (event, data) => {
-        console.error("HLS error:", event, data);
-      });
-
-      return () => {
-        hls.destroy();
-      };
+      return () => hls.destroy();
     }
   }, [streamUrl]);
 
@@ -54,14 +47,19 @@ export default function MovieWatch() {
     id: 1,
     title: "Бойцовский клуб",
     streamUrl: "https://content.jwplatform.com/manifests/vM7nH0Kl.m3u8",
-    imdbId: "tt0137523",
   };
 
-  const userReview = null; // временно пусто
-  const reviews = { items: [] }; // временно пусто
+  const { data } = useReviews(movie.id, 0, 20);
+  const createReview = useCreateReview(movie.id);
 
-  const submitReview = async (payload) => {
-    console.log("Review submitted:", payload);
+  const reviews = data?.items ?? [];
+  const userReview = null;
+
+  const submitReview = ({ text }) => {
+    createReview.mutate({
+      movieId: movie.id,
+      content: text,
+    });
     setModalOpen(false);
     setEditing(null);
   };
@@ -77,7 +75,7 @@ export default function MovieWatch() {
             {userReview ? (
                 <div className="card">
                   <h3 className="section-title">Ваш отзыв</h3>
-                  <ReviewCard review={userReview} isOwner />
+                  <ReviewCard review={{ ...userReview, body: userReview.content }} isOwner />
                   <button
                       className="btn"
                       onClick={() => {
@@ -102,22 +100,24 @@ export default function MovieWatch() {
 
             <div className="section">
               <h3 className="section-title">Отзывы</h3>
-              {(reviews.items || []).map((r) => (
-                  <ReviewCard key={r.id} review={r} isOwner={r.isOwner} />
+              {reviews.map((r) => (
+                  <ReviewCard
+                      key={r.id}
+                      review={{ ...r, body: r.content }}
+                      isOwner={false}
+                  />
               ))}
             </div>
 
             <div className="section card">
               <h3 className="section-title">Комментарии</h3>
-              <CommentsSection imdbId={movie.imdbId} />
+              <CommentsSection movieId={movie.id} />
             </div>
           </div>
 
-          {movie.imdbId && (
-              <div className="watch-sidebar">
-                <RecommendationsRail imdbId={movie.imdbId} />
-              </div>
-          )}
+          <div className="watch-sidebar">
+            <RecommendationsRail movieId={movie.id} />
+          </div>
         </div>
 
         <ReviewFormModal

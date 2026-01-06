@@ -1,78 +1,74 @@
 /* src/styles/components/HeroCarousel.css */
-.swiper-container * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+.hero-carousel {
+    margin-bottom: 40px;
 }
 
-.swiper-container {
-    width: 100%;
-    height: 350px; /* фиксированная высота */
-    transition: opacity .6s ease;
+.carousel-header h2 {
+    margin: 0 0 4px 0;
 }
 
-.swiper-slide {
-    background-color: #222;
-    border-radius: 10px;
-    overflow: hidden;
-    cursor: pointer;
-}
-
-.swiper-slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.swiper-slide .swiper-content {
-    position: absolute;
-    bottom: 4%;
-    left: 2%;
-    max-width: 70%;
-    padding: 10px 16px;
-    color: #fff;
-    font-family: Verdana, sans-serif;
-    background: rgba(0,0,0,0.6);
-}
-
-.swiper-slide .swiper-content .swiper-title {
-    font-size: 22px;
-    margin-bottom: 5px;
-}
-
-.swiper-slide .swiper-content .swiper-caption {
-    display: block;
+.carousel-header p {
+    margin: 0 0 16px 0;
+    color: #aaa;
     font-size: 14px;
-    line-height: 1.4;
 }
 
-.swiper-slide .watch-btn {
-    margin-top: 8px;
-    padding: 5px 10px;
-    background-color: #2563eb;
-    border: none;
-    border-radius: 5px;
-    color: #fff;
-    font-size: 13px;
+.carousel-card {
+    position: relative;
     cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-.swiper-pagination-bullets {
-    bottom: 10px !important;
+.carousel-card img {
+    width: 100%;
+    display: block;
+    transition: transform 0.3s ease;
 }
 
-.swiper-pagination-bullet {
-    width: 12px;
-    height: 12px;
-    background-color: #337AB7;
-    opacity: 0.5;
-    margin: 0 5px;
+.carousel-card:hover img {
+    transform: scale(1.05);
 }
 
-.swiper-pagination-bullet.swiper-pagination-bullet-active {
-    opacity: 1;
-}
-
-.swiper-button-next, .swiper-button-prev {
+.carousel-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px;
+    background: rgba(0,0,0,0.6);
     color: #fff;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.carousel-card:hover .carousel-overlay {
+    transform: translateY(0);
+}
+
+.carousel-overlay h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.carousel-overlay span {
+    font-size: 14px;
+}
+
+.watch-btn {
+    padding: 6px 12px;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.watch-btn:hover {
+    background: #1565c0;
 }
