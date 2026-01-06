@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     host: true,
-    allowedHosts: ['f62652972cbe.ngrok-free.app'],
+    allowedHosts: ['21f6a1498cc3.ngrok-free.app'],
   },
   test: {
     environment: 'jsdom',
