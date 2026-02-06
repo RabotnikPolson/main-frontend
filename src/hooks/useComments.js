@@ -1,54 +1,57 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import http from "../shared/api/http";
+import {
+  listRootComments,
+  getCommentCount,
+  getCommentWithReplies,
+  createComment,
+  updateComment,
+  deleteComment,
+  reactComment,
+} from "../shared/api/comments";
 
-async function listRootComments({ imdbId, page = 0, size = 20, sort = "top" }) {
-  const { data } = await http.get(`/movies/${imdbId}/comments`, {
-    params: { page, size, sort },
-  });
-  return {
-    items: data.content,
-    hasMore: !data.last,
-  };
-}
-
-async function createComment({ imdbId, body, parentId }) {
-  const { data } = await http.post(`/movies/${imdbId}/comments`, {
-    body,
-    parentId,
-  });
-  return data;
-}
-
-async function updateComment(id, payload) {
-  const { data } = await http.put(`/comments/${id}`, payload);
-  return data;
-}
-
-async function deleteComment(id) {
-  await http.delete(`/comments/${id}`);
-}
-
-async function reactComment(id, reaction) {
-  await http.post(`/comments/${id}/reactions/${reaction}`);
-}
-
-export function useRootComments(imdbId, page, size, sort) {
+/**
+ * Корневые комментарии
+ */
+export function useRootComments({ movieId, order }) {
   return useQuery({
-    queryKey: ["commentsRoot", imdbId, page, size, sort],
-    enabled: !!imdbId,
-    queryFn: () => listRootComments({ imdbId, page, size, sort }),
+    queryKey: ["comments", movieId, order],
+    queryFn: () => listRootComments({ movieId, order }),
+    enabled: !!movieId,
   });
 }
 
-export const useReplies = () => ({
-  isLoading: false,
-  data: { items: [] },
-});
+/**
+ * Ответы к комментарию
+ */
+export function useReplies(commentId) {
+  return useQuery({
+    queryKey: ["comment", commentId, "replies"],
+    queryFn: () => getCommentWithReplies(commentId),
+    enabled: !!commentId,
+  });
+}
 
-export function useCommentMutations(imdbId) {
+/**
+ * Счётчик комментариев
+ */
+export function useCommentCount(movieId) {
+  return useQuery({
+    queryKey: ["comments", movieId, "count"],
+    queryFn: () => getCommentCount(movieId),
+    enabled: !!movieId,
+  });
+}
+
+/**
+ * Мутации
+ */
+export function useCommentMutations(movieId) {
   const qc = useQueryClient();
-  const invalidate = () =>
-    qc.invalidateQueries({ queryKey: ["commentsRoot", imdbId] });
+
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ["comments", movieId] });
+    qc.invalidateQueries({ queryKey: ["comments", movieId, "count"] });
+  };
 
   return {
     create: useMutation({
@@ -64,7 +67,7 @@ export function useCommentMutations(imdbId) {
       onSuccess: invalidate,
     }),
     react: useMutation({
-      mutationFn: ({ id, reaction }) => reactComment(id, reaction),
+      mutationFn: ({ id, emoji }) => reactComment(id, emoji),
       onSuccess: invalidate,
     }),
   };

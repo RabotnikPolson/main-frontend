@@ -1,27 +1,49 @@
 import http from "./http";
 
-export const listRootComments = ({ imdbId, page = 0, size = 20, sort = "top" }) =>
-  http
-    .get(`/movies/${imdbId}/comments`, { params: { page, size, sort } })
-    .then(r => r.data);
+/**
+ * Корневые комментарии по фильму
+ * order: new | old | top
+ */
+export const listRootComments = ({ movieId, page = 0, size = 20, order = "new" }) =>
+    http
+        .get(`/comments/movie/${movieId}`, {
+            params: { page, size, order },
+        })
+        .then((r) => r.data);
 
-export const listReplies = ({ commentId, page = 0, size = 10 }) =>
-  Promise.resolve({ content: [] });
+/**
+ * Счётчики комментариев (root + total)
+ */
+export const getCommentCount = (movieId) =>
+    http.get(`/comments/movie/${movieId}/count`).then((r) => r.data);
 
-export const createComment = ({ imdbId, body, parentId }) =>
-  http
-    .post(`/movies/${imdbId}/comments`, { body, parentId })
-    .then(r => r.data);
+/**
+ * Один комментарий + его ответы
+ */
+export const getCommentWithReplies = (commentId) =>
+    http.get(`/comments/${commentId}`).then((r) => r.data);
 
+/**
+ * Создать комментарий или ответ
+ */
+export const createComment = (payload) =>
+    http.post("/comments", payload).then((r) => r.data);
+
+/**
+ * Обновить комментарий
+ */
 export const updateComment = (id, payload) =>
-  http.put(`/comments/${id}`, payload).then(r => r.data);
+    http.put(`/comments/${id}`, payload).then((r) => r.data);
 
-export const deleteComment = id =>
-  http.delete(`/comments/${id}`).then(r => r.data);
+/**
+ * Удалить комментарий
+ */
+export const deleteComment = (id) =>
+    http.delete(`/comments/${id}`);
 
-export const reactComment = (id, reaction, method = "POST") => {
-  const url = `/comments/${id}/reactions/${reaction}`;
-  return method === "DELETE"
-    ? http.delete(url).then(r => r.data)
-    : http.post(url).then(r => r.data);
-};
+/**
+ * Поставить / снять реакцию
+ * emoji: 👍 👎 😂 😡 и т.д.
+ */
+export const reactComment = (id, emoji) =>
+    http.post(`/comments/${id}/reactions`, { emoji }).then((r) => r.data);

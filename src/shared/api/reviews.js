@@ -1,22 +1,44 @@
+// src/shared/api/reviews.js
 import http from "./http";
 
-export const previewReviews = ({ imdbId, limit = 5 }) =>
-  http
-    .get(`/movies/${imdbId}/reviews`, { params: { page: 0, size: limit } })
-    .then(r => r.data);
+export async function listByMovie(movieId, { page = 0, size = 5, sort = "createdAt,desc" } = {}) {
+    const { data } = await http.get(`/reviews/movie/${movieId}`, {
+        params: { page, size, sort },
+    });
 
-export const listReviews = ({ imdbId, page = 0, size = 20, sort = "helpful" }) =>
-  http
-    .get(`/movies/${imdbId}/reviews`, { params: { page, size, sort } })
-    .then(r => r.data);
+    // Spring Page JSON -> нормальная форма для UI
+    const items = Array.isArray(data?.content) ? data.content : Array.isArray(data?.items) ? data.items : [];
+    const total =
+        typeof data?.totalElements === "number"
+            ? data.totalElements
+            : typeof data?.total === "number"
+                ? data.total
+                : items.length;
 
-export const createReview = ({ imdbId, rating, text }) =>
-  http
-    .post(`/movies/${imdbId}/reviews`, { rating, text })
-    .then(r => r.data);
+    return {
+        items,
+        total,
+        page: typeof data?.number === "number" ? data.number : page,
+        size: typeof data?.size === "number" ? data.size : size,
+        totalPages: typeof data?.totalPages === "number" ? data.totalPages : 1,
+    };
+}
 
-export const updateReview = (id, payload) =>
-  http.put(`/reviews/${id}`, payload).then(r => r.data);
+export async function createReview({ movieId, content, parentId = null }) {
+    const body = { movieId, content };
+    // parentId добавляем только если реально нужен (иначе не шлём мусор)
+    if (parentId !== null && parentId !== undefined) body.parentId = parentId;
 
-export const reactReview = (id, reaction) =>
-  http.post(`/reviews/${id}/reactions/${reaction}`).then(r => r.data);
+    const { data } = await http.post("/reviews", body);
+    return data;
+}
+
+export async function updateReview(reviewId, { content }) {
+    const { data } = await http.put(`/reviews/${reviewId}`, { content });
+    return data;
+}
+
+export async function deleteReview(reviewId) {
+    const { data } = await http.delete(`/reviews/${reviewId}`);
+    return data;
+}

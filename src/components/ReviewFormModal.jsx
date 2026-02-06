@@ -1,70 +1,108 @@
-import { useEffect, useState } from "react";
-import RatingStars from "./RatingStars";
+// src/components/ReviewFormModal.jsx
+import { useEffect, useMemo, useState } from "react";
+
+function ScorePicker({ value, onChange }) {
+    // OKKO-style: 1..10
+    return (
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {Array.from({ length: 10 }).map((_, i) => {
+                const n = i + 1;
+                const active = n <= value;
+                return (
+                    <button
+                        key={n}
+                        type="button"
+                        onClick={() => onChange(n)}
+                        className="btn"
+                        style={{
+                            padding: "6px 10px",
+                            opacity: active ? 1 : 0.45,
+                            minWidth: 38,
+                        }}
+                    >
+                        {n}
+                    </button>
+                );
+            })}
+        </div>
+    );
+}
 
 export default function ReviewFormModal({ open, initial, onClose, onSubmit }) {
-  const [stars, setStars] = useState(0);
-  const [text, setText] = useState("");
+    const [content, setContent] = useState("");
+    const [score, setScore] = useState(0);
+    const [err, setErr] = useState("");
 
-  useEffect(() => {
-    if (open) {
-      setStars((initial?.rating || 0) / 2);
-      setText(initial?.text || "");
-    }
-  }, [open, initial]);
+    const isEdit = useMemo(() => Boolean(initial?.id), [initial]);
 
-  if (!open) return null;
+    useEffect(() => {
+        if (!open) return;
+        setContent(initial?.content ?? "");
+        setScore(initial?.score ?? 0);
+        setErr("");
+    }, [open, initial]);
 
-  const submit = () => {
-    const rating10 = Math.round(stars * 2); // 5 с половинками → 10-балльная
-    onSubmit({ rating: rating10, text });
-  };
+    if (!open) return null;
 
-  return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,.6)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1000,
-      }}
-    >
-      <div
-        style={{
-          width: 520,
-          background: "#0f1115",
-          border: "1px solid #2a2f3a",
-          borderRadius: 12,
-          padding: 16,
-        }}
-      >
-        <h3 style={{ margin: 0, marginBottom: 8 }}>
-          {initial ? "Редактировать отзыв" : "Оценить и написать отзыв"}
-        </h3>
-        <RatingStars value={stars} onChange={setStars} />
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={6}
-          style={{ width: "100%", marginTop: 12, resize: "vertical" }}
-          placeholder="Ваши мысли о фильме"
-        />
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: 8,
-            marginTop: 12,
-          }}
-        >
-          <button onClick={onClose}>Отмена</button>
-          <button onClick={submit} disabled={stars <= 0}>
-            Сохранить
-          </button>
+    const handleSubmit = async () => {
+        const trimmed = content.trim();
+
+        if (!trimmed) {
+            setErr("Текст отзыва не должен быть пустым.");
+            return;
+        }
+        if (!score || score < 1 || score > 10) {
+            setErr("Поставь оценку от 1 до 10.");
+            return;
+        }
+
+        setErr("");
+        await onSubmit({ content: trimmed, score });
+    };
+
+    return (
+        <div className="modal-overlay">
+            <div className="modal card" style={{ maxWidth: 760, width: "100%" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                    <h3 className="section-title" style={{ margin: 0 }}>
+                        {isEdit ? "Изменить отзыв" : "Написать отзыв"}
+                    </h3>
+                    <button className="btn" type="button" onClick={onClose}>
+                        ✕
+                    </button>
+                </div>
+
+                <div style={{ marginTop: 14 }}>
+                    <div style={{ marginBottom: 8, opacity: 0.85 }}>Оценка</div>
+                    <ScorePicker value={score} onChange={setScore} />
+                </div>
+
+                <div style={{ marginTop: 14 }}>
+                    <div style={{ marginBottom: 8, opacity: 0.85 }}>Текст</div>
+                    <textarea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        rows={6}
+                        style={{ width: "100%" }}
+                        placeholder="Напиши, что понравилось/не понравилось..."
+                    />
+                </div>
+
+                {err && (
+                    <div style={{ marginTop: 10, color: "#ff6b6b" }}>
+                        {err}
+                    </div>
+                )}
+
+                <div style={{ marginTop: 14, display: "flex", gap: 10 }}>
+                    <button className="btn" type="button" onClick={handleSubmit}>
+                        Отправить
+                    </button>
+                    <button className="btn" type="button" onClick={onClose}>
+                        Отмена
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

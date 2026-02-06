@@ -1,32 +1,51 @@
-// src/hooks/useUserSettings.js
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import http from "../shared/api/http";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import http from '../shared/api/http';
+// useAuth находится в этой же директории
+import { useAuth } from './useAuth';
 
-export const useUserSettings = username => {
+/**
+ * useUserSettings hook
+ *
+ * Этот хук обёртывает обращения к API для чтения и обновления настроек пользователя.
+ * Настройки доступны только для текущего аутентифицированного пользователя; для других
+ * пользователей они не загружаются. Если переданное имя пользователя не совпадает
+ * с логином текущего пользователя, хук вернёт `null` в данных. При успешном обновлении
+ * инвалидирует кеш.
+ *
+ * @param {string} username Имя пользователя, чьи настройки нужно загрузить.
+ */
+export const useUserSettings = (username) => {
   const qc = useQueryClient();
-  const key = ["user", username, "settings"];
+  const { user } = useAuth();
+  const isMe = !!username && user?.username === username;
+
+  const key = ['user', username, 'settings'];
 
   const q = useQuery({
     queryKey: key,
     queryFn: async () => {
-      const res = await http.get(
-        `/users/${encodeURIComponent(username)}/settings`
-      );
+      // Настройки доступны только для себя
+      if (!isMe) return null;
+      const res = await http.get('/settings/me');
       return res.data;
     },
-    enabled: !!username,
+    enabled: isMe,
   });
 
   const m = useMutation({
-    mutationFn: async payload => {
-      const res = await http.put(
-        `/users/${encodeURIComponent(username)}/settings`,
-        payload
-      );
+    mutationFn: async (payload) => {
+      const res = await http.put('/settings/me', payload);
       return res.data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: key }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: key });
+    },
   });
 
-  return { ...q, save: m.mutateAsync, saveStatus: m.status, saveError: m.error };
+  return {
+    ...q,
+    save: m.mutateAsync,
+    saveStatus: m.status,
+    saveError: m.error,
+  };
 };

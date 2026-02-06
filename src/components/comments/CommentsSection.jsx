@@ -1,101 +1,109 @@
-// src/components/Comments/CommentsSection.jsx
 import { useState } from "react";
 import CommentItem from "./CommentItem";
 import {
-  useRootComments,
-  useReplies,
-  useCommentMutations,
+    useRootComments,
+    useReplies,
+    useCommentCount,
+    useCommentMutations,
 } from "../../hooks/useComments";
 
-function Replies({ commentId }) {
-  const { data, isLoading } = useReplies(commentId);
-  if (isLoading) return <div style={{ color: "#8a8f98" }}>Загрузка…</div>;
-  if (!data || data.items?.length === 0) return null;
+export default function CommentsSection({ movieId }) {
+    const [order, setOrder] = useState("new");
+    const [text, setText] = useState("");
 
-  return (
-    <div style={{ borderLeft: "2px solid #2a2f3a", marginLeft: 12, paddingLeft: 12 }}>
-      {data.items.map((n) => (
-        <CommentItem key={n.id} node={n} />
-      ))}
-    </div>
-  );
+    const { data: count } = useCommentCount(movieId);
+    const { data, isLoading } = useRootComments({ movieId, order });
+    const mutations = useCommentMutations(movieId);
+
+    const comments = data?.content ?? [];
+
+    const submitRoot = () => {
+        if (!text.trim()) return;
+        mutations.create.mutate({
+            movieId,
+            content: text,
+            parentId: null,
+        });
+        setText("");
+    };
+
+    return (
+        <section className="comments-section">
+            <div className="comments-header">
+                <h3>
+                    Комментарии{" "}
+                    {count && <span>({count.totalCount})</span>}
+                </h3>
+
+                <select value={order} onChange={(e) => setOrder(e.target.value)}>
+                    <option value="top">Популярные</option>
+                    <option value="new">Сначала новые</option>
+                    <option value="old">Сначала старые</option>
+                </select>
+            </div>
+
+            <div className="comment-form">
+        <textarea
+            placeholder="Написать комментарий…"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+        />
+                <button onClick={submitRoot}>Отправить</button>
+            </div>
+
+            {isLoading && <p>Загрузка…</p>}
+
+            {comments.map((c) => (
+                <CommentThread
+                    key={c.id}
+                    comment={c}
+                    movieId={movieId}
+                    mutations={mutations}
+                />
+            ))}
+        </section>
+    );
 }
 
-export default function CommentsSection({ imdbId }) {
-  const [sort, setSort] = useState("top");
-  const [page, setPage] = useState(0);
+function CommentThread({ comment, movieId, mutations }) {
+    const [open, setOpen] = useState(false);
+    const { data } = useReplies(open ? comment.id : null);
 
-  const { data, isLoading } = useRootComments(imdbId, page, 20, sort);
-  const { create, update, remove, react } = useCommentMutations(imdbId);
+    return (
+        <div className="comment-thread">
+            <CommentItem
+                node={comment}
+                onReply={(content) =>
+                    mutations.create.mutate({
+                        movieId,
+                        content,
+                        parentId: comment.id,
+                    })
+                }
+                onDelete={() => mutations.remove.mutate(comment.id)}
+                onReact={(emoji) =>
+                    mutations.react.mutate({ id: comment.id, emoji })
+                }
+            />
 
-  const reply = (parentId, text) =>
-    create.mutate({ imdbId, body: text, parentId });
+            {comment.repliesCount > 0 && !open && (
+                <button className="show-replies" onClick={() => setOpen(true)}>
+                    Показать ответы ({comment.repliesCount})
+                </button>
+            )}
 
-  const edit = (id, text) =>
-    update.mutate({ id, payload: { body: text } });
-
-  const del = (id) => remove.mutate(id);
-
-  const reactFn = (id, reaction) =>
-    react.mutate({ id, reaction });
-
-  return (
-    <section>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h3>Комментарии</h3>
-        <select
-          value={sort}
-          onChange={(e) => {
-            setSort(e.target.value);
-            setPage(0);
-          }}
-        >
-          <option value="top">Топ</option>
-          <option value="new">Новые</option>
-        </select>
-      </div>
-
-      <div style={{ marginBottom: 12 }}>
-        <textarea id="newComment" rows={3} style={{ width: "100%" }} />
-        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 6 }}>
-          <button
-            onClick={() => {
-              const el = document.getElementById("newComment");
-              const value = el.value.trim();
-              if (value)
-                create.mutate(
-                  { imdbId, body: value },
-                  { onSuccess: () => (el.value = "") }
-                );
-            }}
-          >
-            Отправить
-          </button>
+            {open &&
+                data?.replies?.map((r) => (
+                    <CommentItem
+                        key={r.id}
+                        node={r}
+                        isReply
+                        onDelete={() => mutations.remove.mutate(r.id)}
+                        onReact={(emoji) =>
+                            mutations.react.mutate({ id: r.id, emoji })
+                        }
+                    />
+                ))}
         </div>
-      </div>
-
-      {isLoading && <div style={{ color: "#8a8f98" }}>Загрузка…</div>}
-
-      {!isLoading && data?.items?.length === 0 && (
-        <div style={{ color: "#8a8f98" }}>Комментариев пока нет</div>
-      )}
-
-      {data?.items?.map((n) => (
-        <CommentItem
-          key={n.id}
-          node={n}
-          onReply={reply}
-          onEdit={edit}
-          onDelete={del}
-          onReact={reactFn}
-        >
-          <Replies commentId={n.id} />
-        </CommentItem>
-      ))}
-
-      {data?.hasMore && (
-        <button onClick={() => setPage((p) => p + 1)}>Загрузить ещё</button>
-      )}
-    </section>
-  );
+    );
 }

@@ -1,67 +1,55 @@
 // src/hooks/useReviews.js
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import http from "../shared/api/http";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createReview, deleteReview, listByMovie, updateReview } from "../shared/api/reviews";
+import { rateMovie } from "../shared/api/ratings";
 
-async function listReviews({ imdbId, page = 0, size = 10 }) {
-  const { data } = await http.get(`/movies/${imdbId}/reviews`, {
-    params: { page, size },
-  });
-  return {
-    items: data.content,
-    hasMore: !data.last,
-  };
-}
+const keys = {
+  byMovie: (movieId, page, size) => ["reviews", "movie", movieId, page, size],
+  moviePrefix: (movieId) => ["reviews", "movie", movieId],
+};
 
-async function createReview({ imdbId, rating, title, body }) {
-  const { data } = await http.post(`/movies/${imdbId}/reviews`, {
-    rating,
-    title,
-    body,
-  });
-  return data;
-}
-
-async function updateReview(id, payload) {
-  const { data } = await http.put(`/reviews/${id}`, payload);
-  return data;
-}
-
-async function reactReview(id, reaction) {
-  await http.post(`/reviews/${id}/reactions/${reaction}`);
-}
-
-export function useReviews(imdbId, page = 0, size = 10) {
+export function useReviewsByMovie(movieId, page = 0, size = 5) {
   return useQuery({
-    queryKey: ["reviews", imdbId, page, size],
-    enabled: !!imdbId,
-    queryFn: () => listReviews({ imdbId, page, size }),
-    keepPreviousData: true,
+    queryKey: keys.byMovie(movieId, page, size),
+    enabled: !!movieId,
+    queryFn: () => listByMovie(movieId, { page, size, sort: "createdAt,desc" }),
   });
 }
 
-export function useCreateOrUpdateReview(imdbId) {
+export function useReviewMutations(movieId) {
   const qc = useQueryClient();
-  const invalidate = () =>
-    qc.invalidateQueries({ queryKey: ["reviews", imdbId] });
+
+  const invalidateMovie = async () => {
+    if (!movieId) return;
+    await qc.invalidateQueries({ queryKey: keys.moviePrefix(movieId) });
+  };
 
   const create = useMutation({
-    mutationFn: createReview,
-    onSuccess: invalidate,
+    mutationFn: async ({ content, score }) => {
+      // 1) оценка
+      await rateMovie(movieId, score);
+      // 2) текст отзыва
+      return createReview({ movieId, content });
+    },
+    onSuccess: invalidateMovie,
   });
 
   const update = useMutation({
-    mutationFn: ({ id, payload }) => updateReview(id, payload),
-    onSuccess: invalidate,
+    mutationFn: async ({ id, content, score }) => {
+      await rateMovie(movieId, score);
+      return updateReview(id, { content });
+    },
+    onSuccess: invalidateMovie,
   });
 
-  return { create, update };
-}
-
-export function useReactReview(imdbId) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, reaction }) => reactReview(id, reaction),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["reviews", imdbId] }),
+  const remove = useMutation({
+    mutationFn: async (id) => deleteReview(id),
+    onSuccess: invalidateMovie,
   });
+
+  return {
+    createReview: create,
+    updateReview: update,
+    deleteReview: remove,
+  };
 }

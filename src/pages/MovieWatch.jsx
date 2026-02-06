@@ -1,11 +1,14 @@
-// src/pages/MovieWatch.jsx
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 import Hls from "hls.js";
 
 import ReviewCard from "../components/ReviewCard";
 import ReviewFormModal from "../components/ReviewFormModal";
+import ReviewReadModal from "../components/ReviewReadModal";
 import CommentsSection from "../components/Comments/CommentsSection";
 import RecommendationsRail from "../components/RightRail/RecommendationsRail";
+
+import { useReviewsByMovie, useReviewMutations } from "../hooks/useReviews";
 
 import "../styles/pages/MovieWatch.css";
 
@@ -30,9 +33,7 @@ function MoviePlayer({ streamUrl, title }) {
         console.error("HLS error:", event, data);
       });
 
-      return () => {
-        hls.destroy();
-      };
+      return () => hls.destroy();
     }
   }, [streamUrl]);
 
@@ -47,23 +48,68 @@ function MoviePlayer({ streamUrl, title }) {
 }
 
 export default function MovieWatch() {
+  const { id } = useParams();
+  const movieId = Number(id || 1);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const movie = {
-    id: 1,
-    title: "Бойцовский клуб",
-    streamUrl: "https://content.jwplatform.com/manifests/vM7nH0Kl.m3u8",
-    imdbId: "tt0137523",
+  const [readOpen, setReadOpen] = useState(false);
+  const [readReview, setReadReview] = useState(null);
+
+  // ВАЖНО: позже подключишь useMovie(movieId).
+  const movie = useMemo(
+      () => ({
+        id: movieId,
+        title: "Бойцовский клуб",
+        streamUrl: "https://content.jwplatform.com/manifests/vM7nH0Kl.m3u8",
+        imdbId: "tt0137523",
+      }),
+      [movieId]
+  );
+
+  // грузим 5 последних для MovieWatch (как OKKO: превью)
+  const reviewsQuery = useReviewsByMovie(movie.id, 0, 5);
+  const reviews = reviewsQuery.data?.items || [];
+  const totalReviews = reviewsQuery.data?.total ?? 0;
+
+  const mutations = useReviewMutations(movie.id);
+
+  const openRead = (review) => {
+    setReadReview(review);
+    setReadOpen(true);
   };
 
-  const userReview = null; // временно пусто
-  const reviews = { items: [] }; // временно пусто
+    const submitReview = async (payload) => {
+        try {
+            // payload приходит из ReviewFormModal: { content, score }
+            const { content, score } = payload;
 
-  const submitReview = async (payload) => {
-    console.log("Review submitted:", payload);
-    setModalOpen(false);
-    setEditing(null);
+            if (editing?.id) {
+                await mutations.updateReview.mutateAsync({ id: editing.id, content, score });
+            } else {
+                await mutations.createReview.mutateAsync({ content, score });
+            }
+
+            setModalOpen(false);
+            setEditing(null);
+        } catch (e) {
+            console.error("Review submit failed:", e);
+            alert("Не удалось отправить отзыв. Проверь консоль и ответ сервера.");
+        }
+    };
+
+
+    const onDelete = async (reviewId) => {
+    if (!reviewId) return;
+    if (!confirm("Удалить отзыв?")) return;
+
+    try {
+      await mutations.remove.mutateAsync(reviewId);
+    } catch (e) {
+      console.error("Review delete failed:", e);
+      alert("Не удалось удалить отзыв.");
+    }
   };
 
   return (
@@ -74,42 +120,53 @@ export default function MovieWatch() {
 
             <h1 className="watch-title">{movie.title}</h1>
 
-            {userReview ? (
-                <div className="card">
-                  <h3 className="section-title">Ваш отзыв</h3>
-                  <ReviewCard review={userReview} isOwner />
-                  <button
-                      className="btn"
-                      onClick={() => {
-                        setEditing(userReview);
+            <button
+                className="btn"
+                onClick={() => {
+                  setEditing(null);
+                  setModalOpen(true);
+                }}
+            >
+              Написать отзыв
+            </button>
+
+            <div className="section" style={{ marginTop: 18 }}>
+              <h3 className="section-title">
+                Отзывы {typeof totalReviews === "number" ? `(${totalReviews})` : ""}
+              </h3>
+
+              {reviewsQuery.isLoading && <div style={{ opacity: 0.75 }}>Загрузка…</div>}
+              {reviewsQuery.isError && (
+                  <div style={{ opacity: 0.75 }}>
+                    Ошибка загрузки отзывов. Открой консоль.
+                  </div>
+              )}
+
+              {!reviewsQuery.isLoading && reviews.length === 0 && (
+                  <div style={{ opacity: 0.75 }}>Пока нет отзывов.</div>
+              )}
+
+              {reviews.map((r) => (
+                  <ReviewCard
+                      key={r.id}
+                      review={r}
+                      onReadFull={openRead}
+                      // isOwner пока не можем определить без поля from backend
+                      isOwner={false}
+                      onEdit={() => {
+                        setEditing(r);
                         setModalOpen(true);
                       }}
-                  >
-                    Изменить
-                  </button>
-                </div>
-            ) : (
-                <button
-                    className="btn"
-                    onClick={() => {
-                      setEditing(null);
-                      setModalOpen(true);
-                    }}
-                >
-                  Написать отзыв
-                </button>
-            )}
-
-            <div className="section">
-              <h3 className="section-title">Отзывы</h3>
-              {(reviews.items || []).map((r) => (
-                  <ReviewCard key={r.id} review={r} isOwner={r.isOwner} />
+                      onDelete={() => onDelete(r.id)}
+                  />
               ))}
+
+              {/* Позже сделаем отдельную страницу /movie/:id/reviews (как OKKO "все отзывы") */}
             </div>
 
-            <div className="section card">
+            <div className="section card" style={{ marginTop: 18 }}>
               <h3 className="section-title">Комментарии</h3>
-              <CommentsSection imdbId={movie.imdbId} />
+              <CommentsSection movieId={movie.id} />
             </div>
           </div>
 
@@ -128,6 +185,15 @@ export default function MovieWatch() {
               setEditing(null);
             }}
             onSubmit={submitReview}
+        />
+
+        <ReviewReadModal
+            open={readOpen}
+            review={readReview}
+            onClose={() => {
+              setReadOpen(false);
+              setReadReview(null);
+            }}
         />
       </div>
   );
