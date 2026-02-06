@@ -1,6 +1,12 @@
 import axios from "axios";
 
-const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const BACKENDS = [
+  "http://localhost:8080",
+  "https://271e5230940a.ngrok-free.app",
+];
+
+const host = window.location.hostname;
+const baseURL = host.includes("ngrok") ? BACKENDS[1] : BACKENDS[0];
 
 const http = axios.create({
   baseURL,
