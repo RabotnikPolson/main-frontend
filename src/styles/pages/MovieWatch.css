@@ -9,7 +9,7 @@
 
 .watch-grid {
   display: grid;
-  grid-template-columns:  minmax(720px, 1280px)  420px;
+  grid-template-columns: minmax(720px, 1280px) 420px;
   gap: 24px;
   width: 100%;
   max-width: 1720px;
@@ -30,11 +30,69 @@
   background: black;
 }
 
-.watch-video {
-  width: 100%;
-  height: auto;
+.watch-player-panel {
+  min-height: 360px;
   aspect-ratio: 16 / 9;
-  display: block;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+}
+
+.watch-open-btn {
+  align-self: flex-start;
+  background: #ffffff;
+  color: #111;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 24px;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.watch-open-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.watch-player-note {
+  color: #d3d3d3;
+  margin: 0;
+  font-size: 15px;
+}
+
+.watch-player-status {
+  color: #b5b5b5;
+  margin: 0;
+  font-size: 14px;
+}
+
+.watch-player-status-error {
+  color: #ff9696;
+}
+
+.watch-embed-controls {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.watch-embed-frame-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid #2b2b2b;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #111;
+}
+
+.watch-embed-frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 /* Надпись под плеером */
@@ -115,4 +173,5 @@
   border: none;
   color: #aaa;
   padding: 6px 8px;
+  cursor: pointer;
 }
