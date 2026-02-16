@@ -1,6 +1,11 @@
 // src/hooks/useReviews.js
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createReview, deleteReview, listByMovie, updateReview } from "../shared/api/reviews";
+import {
+  createReview,
+  deleteReview,
+  listByMovie,
+  updateReview,
+} from "../shared/api/reviews";
 import { rateMovie } from "../shared/api/ratings";
 
 const keys = {
@@ -26,9 +31,7 @@ export function useReviewMutations(movieId) {
 
   const create = useMutation({
     mutationFn: async ({ content, score }) => {
-      // 1) оценка
       await rateMovie(movieId, score);
-      // 2) текст отзыва
       return createReview({ movieId, content });
     },
     onSuccess: invalidateMovie,
@@ -50,6 +53,6 @@ export function useReviewMutations(movieId) {
   return {
     createReview: create,
     updateReview: update,
-    deleteReview: remove,
+    deleteReview: remove, 
   };
 }

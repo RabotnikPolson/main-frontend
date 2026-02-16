@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import ReviewCard from "../components/ReviewCard";
-import { useReviews } from "../hooks/useReviews";
+import { useReviewsByMovie  } from "../hooks/useReviews";
 
 export default function MovieReviews() {
     const { movieId } = useParams();

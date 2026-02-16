@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+// src/pages/MovieWatch.jsx
+import { useEffect, useMemo, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import ReviewCard from "../components/ReviewCard";
@@ -8,6 +9,7 @@ import ReviewReadModal from "../components/ReviewReadModal";
 import CommentsSection from "../components/comments/CommentsSection";
 import RecommendationsRail from "../components/RightRail/RecommendationsRail";
 
+import { useMovie } from "../hooks/useMovie";
 import { useReviewsByMovie, useReviewMutations } from "../hooks/useReviews";
 import { getStream } from "../shared/api/stream";
 
@@ -26,17 +28,26 @@ function MoviePlayer({ streamData, title, isLoading, isError, onRetry }) {
     <div className="watch-player">
       <div className="watch-player-inner">
         <div className="watch-player-panel">
-          <button className="watch-open-btn" onClick={onOpenPlayer} disabled={!streamData?.url || isLoading}>
+          <button
+            className="watch-open-btn"
+            onClick={onOpenPlayer}
+            disabled={!streamData?.url || isLoading}
+          >
             Открыть плеер
           </button>
 
-          <p className="watch-player-note">Если откроется реклама — закрой вкладку и нажми Play ещё раз.</p>
-          <p className="watch-player-note">Если плеер не запустился — нажми ‘Открыть плеер’ ещё раз.</p>
+          <p className="watch-player-note">
+            Если откроется реклама — закрой вкладку и нажми Play ещё раз.
+          </p>
+          <p className="watch-player-note">
+            Если плеер не запустился — нажми ‘Открыть плеер’ ещё раз.
+          </p>
 
           {isLoading && <p className="watch-player-status">Загрузка ссылки на плеер…</p>}
           {isError && (
             <p className="watch-player-status watch-player-status-error">
-              Не удалось загрузить ссылку на плеер. <button className="btn-ghost" onClick={onRetry}>Повторить</button>
+              Не удалось загрузить ссылку на плеер.{" "}
+              <button className="btn-ghost" onClick={onRetry}>Повторить</button>
             </p>
           )}
 
@@ -67,6 +78,7 @@ function MoviePlayer({ streamData, title, isLoading, isError, onRetry }) {
           )}
         </div>
       </div>
+
       {title && <div className="watch-player-caption">{title}</div>}
     </div>
   );
@@ -74,52 +86,60 @@ function MoviePlayer({ streamData, title, isLoading, isError, onRetry }) {
 
 export default function MovieWatch() {
   const { id } = useParams();
-  const movieId = Number(id || 1);
+  const navigate = useNavigate();
 
+  // 1) реальный фильм из backend
+  const { data: movie, isLoading, isError, error } = useMovie(id);
+
+  // 2) нормальный movieId для запросов stream/reviews/comments
+  const movieId = movie?.id ?? (id ? Number(id) : null);
+
+  // модалки
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
   const [readOpen, setReadOpen] = useState(false);
   const [readReview, setReadReview] = useState(null);
 
-  const movie = useMemo(
-    () => ({
-      id: movieId,
-      title: "Бойцовский клуб",
-      imdbId: "tt0137523",
-    }),
-    [movieId]
-  );
+  // если сменили фильм — сбрасываем модалки/редактирование
+  useEffect(() => {
+    setModalOpen(false);
+    setEditing(null);
+    setReadOpen(false);
+    setReadReview(null);
+  }, [id]);
 
+  // титул вкладки
+  useEffect(() => {
+    if (movie?.title) document.title = `${movie.title} — Cinema App`;
+  }, [movie?.title]);
+
+  // stream (только когда movieId валиден)
   const streamQuery = useQuery({
     queryKey: ["stream", movieId],
     queryFn: () => getStream(movieId),
     enabled: !!movieId,
   });
 
-  // грузим 5 последних для MovieWatch (как OKKO: превью)
-  const reviewsQuery = useReviewsByMovie(movie.id, 0, 5);
+  // отзывы-превью (5 последних)
+  const reviewsQuery = useReviewsByMovie(movieId, 0, 5);
   const reviews = reviewsQuery.data?.items || [];
   const totalReviews = reviewsQuery.data?.total ?? 0;
 
-  const mutations = useReviewMutations(movie.id);
+  const mutations = useReviewMutations(movieId);
 
   const openRead = (review) => {
     setReadReview(review);
     setReadOpen(true);
   };
 
-  const submitReview = async (payload) => {
+  const submitReview = async ({ content, score }) => {
     try {
-      // payload приходит из ReviewFormModal: { content, score }
-      const { content, score } = payload;
-
       if (editing?.id) {
         await mutations.updateReview.mutateAsync({ id: editing.id, content, score });
       } else {
         await mutations.createReview.mutateAsync({ content, score });
       }
-
       setModalOpen(false);
       setEditing(null);
     } catch (e) {
@@ -131,14 +151,40 @@ export default function MovieWatch() {
   const onDelete = async (reviewId) => {
     if (!reviewId) return;
     if (!confirm("Удалить отзыв?")) return;
-
     try {
-      await mutations.remove.mutateAsync(reviewId);
+      await mutations.deleteReview.mutateAsync(reviewId);
     } catch (e) {
       console.error("Review delete failed:", e);
       alert("Не удалось удалить отзыв.");
     }
   };
+
+  if (isLoading) {
+    return <div className="loading container">Загрузка фильма…</div>;
+  }
+
+  if (isError) {
+    return (
+      <div className="container">
+        <div className="error">Ошибка: {error?.message || "Не удалось загрузить фильм"}</div>
+        <button className="button button--ghost" onClick={() => navigate(-1)}>
+          ← Назад
+        </button>
+      </div>
+    );
+  }
+
+  if (!movieId) {
+    return (
+      <div className="container">
+        <div className="error">Фильм не найден</div>
+        <Link to="/" className="button button--ghost">← На главную</Link>
+      </div>
+    );
+  }
+
+  const title = movie?.title ?? "Фильм";
+  const imdbId = movie?.imdbId ?? movie?.imdb_id ?? movie?.raw?.imdbID ?? null;
 
   return (
     <div className="watch">
@@ -146,13 +192,13 @@ export default function MovieWatch() {
         <div className="watch-main">
           <MoviePlayer
             streamData={streamQuery.data}
-            title={movie.title}
+            title={title}
             isLoading={streamQuery.isLoading}
             isError={streamQuery.isError}
             onRetry={() => streamQuery.refetch()}
           />
 
-          <h1 className="watch-title">{movie.title}</h1>
+          <h1 className="watch-title">{title}</h1>
 
           <button
             className="btn"
@@ -171,7 +217,6 @@ export default function MovieWatch() {
 
             {reviewsQuery.isLoading && <div style={{ opacity: 0.75 }}>Загрузка…</div>}
             {reviewsQuery.isError && <div style={{ opacity: 0.75 }}>Ошибка загрузки отзывов. Открой консоль.</div>}
-
             {!reviewsQuery.isLoading && reviews.length === 0 && <div style={{ opacity: 0.75 }}>Пока нет отзывов.</div>}
 
             {reviews.map((r) => (
@@ -179,7 +224,6 @@ export default function MovieWatch() {
                 key={r.id}
                 review={r}
                 onReadFull={openRead}
-                // isOwner пока не можем определить без поля from backend
                 isOwner={false}
                 onEdit={() => {
                   setEditing(r);
@@ -188,19 +232,17 @@ export default function MovieWatch() {
                 onDelete={() => onDelete(r.id)}
               />
             ))}
-
-            {/* Позже сделаем отдельную страницу /movie/:id/reviews (как OKKO "все отзывы") */}
           </div>
 
           <div className="section card" style={{ marginTop: 18 }}>
             <h3 className="section-title">Комментарии</h3>
-            <CommentsSection movieId={movie.id} />
+            <CommentsSection movieId={movieId} />
           </div>
         </div>
 
-        {movie.imdbId && (
+        {!!imdbId && (
           <div className="watch-sidebar">
-            <RecommendationsRail imdbId={movie.imdbId} />
+            <RecommendationsRail imdbId={imdbId} />
           </div>
         )}
       </div>
