@@ -1,5 +1,4 @@
-// src/pages/MovieWatch.jsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
@@ -8,6 +7,7 @@ import ReviewFormModal from "../components/ReviewFormModal";
 import ReviewReadModal from "../components/ReviewReadModal";
 import CommentsSection from "../components/comments/CommentsSection";
 import RecommendationsRail from "../components/RightRail/RecommendationsRail";
+import WatchTracker from "../components/WatchTracker";
 
 import { useMovie } from "../hooks/useMovie";
 import { useReviewsByMovie, useReviewMutations } from "../hooks/useReviews";
@@ -15,9 +15,8 @@ import { getStream } from "../shared/api/stream";
 
 import "../styles/pages/MovieWatch.css";
 
-function MoviePlayer({ streamData, title, isLoading, isError, onRetry }) {
+function MoviePlayer({ streamData, title, isLoading, isError, onRetry, movieId }) {
   const [showEmbed, setShowEmbed] = useState(false);
-  const [iframeKey, setIframeKey] = useState(0);
 
   const onOpenPlayer = () => {
     if (!streamData?.url) return;
@@ -33,47 +32,28 @@ function MoviePlayer({ streamData, title, isLoading, isError, onRetry }) {
             onClick={onOpenPlayer}
             disabled={!streamData?.url || isLoading}
           >
-            Открыть плеер
+            Открыть в новой вкладке
           </button>
 
-          <p className="watch-player-note">
-            Если откроется реклама — закрой вкладку и нажми Play ещё раз.
-          </p>
-          <p className="watch-player-note">
-            Если плеер не запустился — нажми ‘Открыть плеер’ ещё раз.
-          </p>
-
-          {isLoading && <p className="watch-player-status">Загрузка ссылки на плеер…</p>}
+          {isLoading && <p className="watch-player-status">Загрузка видео…</p>}
           {isError && (
             <p className="watch-player-status watch-player-status-error">
-              Не удалось загрузить ссылку на плеер.{" "}
+              Не удалось загрузить видео.{" "}
               <button className="btn-ghost" onClick={onRetry}>Повторить</button>
             </p>
           )}
 
           {!!streamData?.url && (
-            <div className="watch-embed-controls">
+            <div className="watch-embed-controls" style={{ marginTop: '10px' }}>
               <button className="btn" onClick={() => setShowEmbed((v) => !v)}>
-                {showEmbed ? "Скрыть встраиваемый плеер" : "Показать встраиваемый плеер (может не работать)"}
+                {showEmbed ? "Скрыть плеер" : "Смотреть прямо здесь"}
               </button>
-              {showEmbed && (
-                <button className="btn-ghost" onClick={() => setIframeKey((v) => v + 1)}>
-                  Перезагрузить
-                </button>
-              )}
             </div>
           )}
 
           {showEmbed && !!streamData?.url && (
-            <div className="watch-embed-frame-wrap">
-              <iframe
-                key={iframeKey}
-                title={title || "movie-player"}
-                className="watch-embed-frame"
-                src={streamData.url}
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                allowFullScreen
-              />
+            <div className="watch-embed-frame-wrap" style={{ marginTop: '15px' }}>
+              <WatchTracker url={streamData.url} movieId={movieId} />
             </div>
           )}
         </div>
@@ -88,20 +68,14 @@ export default function MovieWatch() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // 1) реальный фильм из backend
   const { data: movie, isLoading, isError, error } = useMovie(id);
-
-  // 2) нормальный movieId для запросов stream/reviews/comments
   const movieId = movie?.id ?? (id ? Number(id) : null);
 
-  // модалки
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
-
   const [readOpen, setReadOpen] = useState(false);
   const [readReview, setReadReview] = useState(null);
 
-  // если сменили фильм — сбрасываем модалки/редактирование
   useEffect(() => {
     setModalOpen(false);
     setEditing(null);
@@ -109,23 +83,19 @@ export default function MovieWatch() {
     setReadReview(null);
   }, [id]);
 
-  // титул вкладки
   useEffect(() => {
     if (movie?.title) document.title = `${movie.title} — Cinema App`;
   }, [movie?.title]);
 
-  // stream (только когда movieId валиден)
   const streamQuery = useQuery({
     queryKey: ["stream", movieId],
     queryFn: () => getStream(movieId),
     enabled: !!movieId,
   });
 
-  // отзывы-превью (5 последних)
   const reviewsQuery = useReviewsByMovie(movieId, 0, 5);
   const reviews = reviewsQuery.data?.items || [];
   const totalReviews = reviewsQuery.data?.total ?? 0;
-
   const mutations = useReviewMutations(movieId);
 
   const openRead = (review) => {
@@ -143,33 +113,29 @@ export default function MovieWatch() {
       setModalOpen(false);
       setEditing(null);
     } catch (e) {
-      console.error("Review submit failed:", e);
-      alert("Не удалось отправить отзыв. Проверь консоль и ответ сервера.");
+      console.error(e);
+      alert("Не удалось отправить отзыв.");
     }
   };
 
   const onDelete = async (reviewId) => {
     if (!reviewId) return;
-    if (!confirm("Удалить отзыв?")) return;
+    if (!window.confirm("Удалить отзыв?")) return;
     try {
       await mutations.deleteReview.mutateAsync(reviewId);
     } catch (e) {
-      console.error("Review delete failed:", e);
+      console.error(e);
       alert("Не удалось удалить отзыв.");
     }
   };
 
-  if (isLoading) {
-    return <div className="loading container">Загрузка фильма…</div>;
-  }
+  if (isLoading) return <div className="loading container">Загрузка фильма…</div>;
 
   if (isError) {
     return (
       <div className="container">
         <div className="error">Ошибка: {error?.message || "Не удалось загрузить фильм"}</div>
-        <button className="button button--ghost" onClick={() => navigate(-1)}>
-          ← Назад
-        </button>
+        <button className="button button--ghost" onClick={() => navigate(-1)}>← Назад</button>
       </div>
     );
   }
@@ -196,6 +162,7 @@ export default function MovieWatch() {
             isLoading={streamQuery.isLoading}
             isError={streamQuery.isError}
             onRetry={() => streamQuery.refetch()}
+            movieId={movieId}
           />
 
           <h1 className="watch-title">{title}</h1>
@@ -214,9 +181,8 @@ export default function MovieWatch() {
             <h3 className="section-title">
               Отзывы {typeof totalReviews === "number" ? `(${totalReviews})` : ""}
             </h3>
-
             {reviewsQuery.isLoading && <div style={{ opacity: 0.75 }}>Загрузка…</div>}
-            {reviewsQuery.isError && <div style={{ opacity: 0.75 }}>Ошибка загрузки отзывов. Открой консоль.</div>}
+            {reviewsQuery.isError && <div style={{ opacity: 0.75 }}>Ошибка загрузки отзывов.</div>}
             {!reviewsQuery.isLoading && reviews.length === 0 && <div style={{ opacity: 0.75 }}>Пока нет отзывов.</div>}
 
             {reviews.map((r) => (
