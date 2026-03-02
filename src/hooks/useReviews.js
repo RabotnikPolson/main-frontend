@@ -1,4 +1,3 @@
-// src/hooks/useReviews.js
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createReview,
@@ -8,14 +7,15 @@ import {
 } from "../shared/api/reviews";
 import { rateMovie } from "../shared/api/ratings";
 
-const keys = {
-  byMovie: (movieId, page, size) => ["reviews", "movie", movieId, page, size],
-  moviePrefix: (movieId) => ["reviews", "movie", movieId],
+const reviewKeys = {
+  all: ['reviews'],
+  movie: (movieId) => [...reviewKeys.all, 'movie', movieId],
+  list: (movieId, page, size) => [...reviewKeys.movie(movieId), { page, size }]
 };
 
 export function useReviewsByMovie(movieId, page = 0, size = 5) {
   return useQuery({
-    queryKey: keys.byMovie(movieId, page, size),
+    queryKey: reviewKeys.list(movieId, page, size),
     enabled: !!movieId,
     queryFn: () => listByMovie(movieId, { page, size, sort: "createdAt,desc" }),
   });
@@ -24,9 +24,9 @@ export function useReviewsByMovie(movieId, page = 0, size = 5) {
 export function useReviewMutations(movieId) {
   const qc = useQueryClient();
 
-  const invalidateMovie = async () => {
+  const invalidate = async () => {
     if (!movieId) return;
-    await qc.invalidateQueries({ queryKey: keys.moviePrefix(movieId) });
+    await qc.invalidateQueries({ queryKey: reviewKeys.movie(movieId) });
   };
 
   const create = useMutation({
@@ -34,7 +34,7 @@ export function useReviewMutations(movieId) {
       await rateMovie(movieId, score);
       return createReview({ movieId, content });
     },
-    onSuccess: invalidateMovie,
+    onSuccess: invalidate,
   });
 
   const update = useMutation({
@@ -42,12 +42,12 @@ export function useReviewMutations(movieId) {
       await rateMovie(movieId, score);
       return updateReview(id, { content });
     },
-    onSuccess: invalidateMovie,
+    onSuccess: invalidate,
   });
 
   const remove = useMutation({
     mutationFn: async (id) => deleteReview(id),
-    onSuccess: invalidateMovie,
+    onSuccess: invalidate,
   });
 
   return {
