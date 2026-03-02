@@ -32,51 +32,53 @@ export default function Register() {
   };
 
   return (
-    <div className="container auth-page">
-      <h1>Регистрация</h1>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h1>Регистрация</h1>
 
-      {mutation.isError && (
-        <p className="error">Не удалось создать аккаунт.</p>
-      )}
+        {mutation.isError && (
+          <p className="error">Не удалось создать аккаунт.</p>
+        )}
 
-      <form onSubmit={handleSubmit} className="auth-form">
-        <input
-          className="input"
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          autoComplete="email"
-          required
-        />
-        <input
-          className="input"
-          type="text"
-          name="username"
-          placeholder="Логин"
-          value={form.username}
-          onChange={handleChange}
-          autoComplete="username"
-          minLength={3}
-          maxLength={50}
-          required
-        />
-        <input
-          className="input"
-          type="password"
-          name="password"
-          placeholder="Пароль"
-          value={form.password}
-          onChange={handleChange}
-          autoComplete="new-password"
-          minLength={6}
-          required
-        />
-        <button className="button" disabled={mutation.isLoading}>
-          {mutation.isLoading ? "Создаём…" : "Создать аккаунт"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <input
+            className="input"
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            autoComplete="email"
+            required
+          />
+          <input
+            className="input"
+            type="text"
+            name="username"
+            placeholder="Логин"
+            value={form.username}
+            onChange={handleChange}
+            autoComplete="username"
+            minLength={3}
+            maxLength={50}
+            required
+          />
+          <input
+            className="input"
+            type="password"
+            name="password"
+            placeholder="Пароль"
+            value={form.password}
+            onChange={handleChange}
+            autoComplete="new-password"
+            minLength={6}
+            required
+          />
+          <button className="button" type="submit" disabled={mutation.isLoading}>
+            {mutation.isLoading ? "Создаём…" : "СОЗДАТЬ АККАУНТ"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

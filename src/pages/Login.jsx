@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import React, { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
@@ -35,48 +34,50 @@ export default function Login() {
   };
 
   return (
-    <div className="container auth-page">
-      <h1>Вход</h1>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h1>Вход</h1>
 
-      {mutation.isError && (
-        <div className="error">
-          Не удалось войти. Проверьте email и пароль.
+        {mutation.isError && (
+          <div className="error">
+            Не удалось войти. Проверьте email и пароль.
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <input
+            className="input"
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            autoComplete="email"
+            required
+          />
+          <input
+            className="input"
+            type="password"
+            name="password"
+            placeholder="Пароль"
+            value={form.password}
+            onChange={handleChange}
+            autoComplete="current-password"
+            required
+          />
+          <button className="button" type="submit" disabled={mutation.isLoading}>
+            {mutation.isLoading ? "Входим…" : "Войти"}
+          </button>
+        </form>
+
+        <div className="auth-switch">
+          <small>
+            Нет аккаунта?{" "}
+            <Link to="/register" state={{ from }}>
+              Зарегистрироваться
+            </Link>
+          </small>
         </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="auth-form">
-        <input
-          className="input"
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          autoComplete="email"
-          required
-        />
-        <input
-          className="input"
-          type="password"
-          name="password"
-          placeholder="Пароль"
-          value={form.password}
-          onChange={handleChange}
-          autoComplete="current-password"
-          required
-        />
-        <button className="button" type="submit" disabled={mutation.isLoading}>
-          {mutation.isLoading ? "Входим…" : "Войти"}
-        </button>
-      </form>
-
-      <div className="auth-switch">
-        <small>
-          Нет аккаунта?{" "}
-          <Link to="/register" state={{ from }}>
-            Зарегистрироваться
-          </Link>
-        </small>
       </div>
     </div>
   );

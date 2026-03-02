@@ -417,3 +417,20 @@
   padding: 14px;
   border-top: 1px solid rgba(255,255,255,0.10);
 }
+
+.profile-activity-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-activity-time {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.profile-activity-desc {
+  font-size: 0.9rem;
+  margin-top: 2px;
+}

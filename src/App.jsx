@@ -20,7 +20,7 @@ const Settings = lazy(() => import("./pages/SettingsPage"));
 const SubscriptionPage = lazy(() => import("./pages/SubscriptionPage"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
-
+const UserActivityPage = lazy(() => import("./pages/UserActivityPage")); // <- новая страница
 
 function ScrollToTop() {
   const location = useLocation();
@@ -53,6 +53,8 @@ export default function App() {
             <Route path="movie/:id/watch" element={<MovieWatch />} />
             <Route path="movie/:id/reviews" element={<MovieReviews />} />
 
+            {/* Страница активности */}
+            <Route path="activity/:username" element={<UserActivityPage />} />
 
             {/* Авторизация */}
             <Route path="login" element={<Login />} />

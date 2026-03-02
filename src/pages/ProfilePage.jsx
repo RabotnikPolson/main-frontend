@@ -303,6 +303,15 @@ export default function ProfilePage() {
             {/* RIGHT: side cards */}
             <div className="profile-side">
               <div className="profile-card">
+  <               div className="profile-section-title">Активность</div>
+  <button
+    className="profile-btn"
+    onClick={() => window.location.href = `/activity/${username}`}
+  >
+    Посмотреть недавние активности
+  </button>
+</div>
+              <div className="profile-card">
                 <div className="profile-section-title">Моя активность</div>
 
                 {analytics.isLoading ? (
