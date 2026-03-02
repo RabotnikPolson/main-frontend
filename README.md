@@ -1,7 +1,119 @@
-Да. Вот обновлённая версия README для **Frontend**, оформленная в том же стиле и с кликабельными ссылками как в бэкенде 👇
+PS C:\Users\murat\IdeaProjects\main-frontend\src> tree /F /A
+Структура папок
+Серийный номер тома: 5ABC-78C6
+C:.
+|   App.css
+|   App.jsx
+|   index.css
+|   index.jsx
+|   main.jsx
+|   setupTests.js
+|
++---assets
+|       no-images.png
+|       react.svg
+|
++---components
+|   |   1.zip
+|   |   2.zip
+|   |   Header.jsx
+|   |   HeroCarousel.jsx
+|   |   MovieCard.jsx
+|   |   MovieGrid.jsx
+|   |   PlayerPlaceholder.jsx
+|   |   RatingStars.jsx
+|   |   ReviewCard.jsx
+|   |   ReviewFormModal.jsx
+|   |   ReviewReadModal.jsx
+|   |   Sidebar.jsx
+|   |
+|   +---comments
+|   |       CommentItem.jsx
+|   |       CommentsSection.jsx
+|   |
+|   \---RightRail
+|           RecommendationsRail.jsx
+|
++---entities
+|   \---movie
+|           mapper.js
+|
++---hooks
+|       3.zip
+|       4.zip
+|       useAuth.js
+|       useComments.js
+|       useFavorites.js
+|       useGenres.js
+|       useMovie.js
+|       useMovies.js
+|       useRecommendations.js
+|       useReviews.js
+|       useSubscription.js
+|       useTheme.js
+|       useUserProfile.js
+|       useUserSettings.js
+|
++---layouts
+|       AppLayout.jsx
+|
++---pages
+|       AddMovie.jsx
+|       AdminAnalytics.jsx
+|       Favorites.jsx
+|       Genres.jsx
+|       History.jsx
+|       Home.jsx
+|       Login.jsx
+|       MovieDetails.jsx
+|       MovieReviews.jsx
+|       MovieWatch.jsx
+|       ProfilePage.jsx
+|       Register.jsx
+|       SettingsPage.jsx
+|       SubscriptionPage.jsx
+|       UserActivityPage.jsx
+|
++---shared
+|   \---api
+|           auth.js
+|           comments.js
+|           favorites.js
+|           http.js
+|           movies.js
+|           ratings.js
+|           recommendations.js
+|           reviews.js
+|           stream.js
+|
++---styles
+|   |   global.css
+|   |   theme.css
+|   |
+|   +---components
+|   |       comments.css
+|   |       Header.css
+|   |       HeroCarousel.css
+|   |       reviewModal.css
+|   |
+|   \---pages
+|           AddMovie.css
+|           AdminAnalytics.css
+|           Auth.css
+|           Favorites.css
+|           Genres.css
+|           History.css
+|           Home.css
+|           MovieDetails.css
+|           MovieWatch.css
+|           Profile.css
+|           Settings.css
+|           Subscription.css
+|
+\---utils
+        localHistory.js
 
----
-
+PS C:\Users\murat\IdeaProjects\main-frontend\src> 
 # 🎬 TestCinema Frontend — README
 
 Полное описание фронтенда дипломного проекта «интеллектуальная онлайн-платформа для просмотра фильмов с персонализацией и аналитикой рынка киноиндустрии Казахстана».
