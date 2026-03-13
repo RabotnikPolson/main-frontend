@@ -10,9 +10,9 @@ export const getMovie = async (id) => {
   return res.data;
 };
 
-export const addFromImdb = async (imdbId) => {
-  const res = await http.post("/movies/addFromImdb", null, {
-    params: { imdbId },
+export const addFromKinopoisk = async (kinopoiskId) => {
+  const res = await http.post("/movies/addFromKinopoisk", null, {
+    params: { kinopoiskId },
   });
   return res.data;
 };
