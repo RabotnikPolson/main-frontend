@@ -31,7 +31,9 @@ export default function AdminMovies() {
       setMsg("Фильм удалён.");
     },
     onError: (err) => {
-      const errorMsg = err.response?.data?.message || err.message || "Ошибка сервера";
+      const status = err.response?.status;
+      const backend = err.response?.data?.message || err.response?.data || "Ошибка сервера";
+      const errorMsg = `${status ? `[${status}] ` : ""}${backend}`;
       setMsg("Ошибка удаления: " + errorMsg);
     },
   });
@@ -102,7 +104,10 @@ export default function AdminMovies() {
                       <button
                         className="button button--ghost"
                         disabled={deleteMut.isPending}
-                        onClick={() => deleteMut.mutate(movie.id)}
+                        onClick={() => {
+                          if (!window.confirm(`Удалить фильм "${movie.title}" (ID ${movie.id})?`)) return;
+                          deleteMut.mutate(movie.id);
+                        }}
                       >
                         Удалить
                       </button>

@@ -18,6 +18,9 @@ export const addFromKinopoisk = async (kinopoiskId) => {
 };
 
 export const deleteMovie = async (id) => {
+  if (!id) {
+    throw new Error("Нет ID фильма для удаления");
+  }
   const res = await http.delete(`/movies/${id}`);
   return res.data;
 };

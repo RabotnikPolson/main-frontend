@@ -16,8 +16,8 @@ export default function Sidebar() {
   ];
 
   if (isAdmin) {
+    items.push({ to: "/admin/movies", label: "Админ-панель" });
     items.push({ to: "/add-movie", label: "Добавить фильм" });
-    items.push({ to: "/admin/movies", label: "Админ: фильмы" });
     items.push({ to: "/analytics", label: "Аналитика" });
   }
 
