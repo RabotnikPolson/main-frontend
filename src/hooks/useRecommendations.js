@@ -1,9 +1,15 @@
-// src/hooks/useRightRail.js
 import { useQuery } from "@tanstack/react-query";
-import { listRightRail } from "../shared/api/recommendations";
+import { listRightRail, getSmartFeed } from "../shared/api/recommendations";
 
-export const useRightRail = (imdbId, limit = 15) =>
+export const useRightRail = (movieId, limit = 15) =>
   useQuery({
-    queryKey: ["rightRail", imdbId, limit],
-    queryFn: () => listRightRail(imdbId, limit),
+    queryKey: ["rightRail", movieId, limit],
+    queryFn: () => listRightRail(movieId, limit),
+    enabled: !!movieId,
+  });
+
+export const useSmartFeed = () =>
+  useQuery({
+    queryKey: ["smartFeed"],
+    queryFn: () => getSmartFeed(),
   });

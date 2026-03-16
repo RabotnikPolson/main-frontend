@@ -1,19 +1,26 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
-const items = [
-  { to: "/", label: "Главная" },
-  { to: "/genres", label: "Жанры" },
-  { to: "/favorites", label: "Избранное" },
-  { to: "/history", label: "История" },
-  { to: "/add-movie", label: "Добавить фильм" },
-  { to: "/profile", label: "Профиль" },
-  { to: "/settings", label: "Настройки" },
-  { to: "/subscription", label: "Подписка" },
-  { to: "/analytics", label: "Аналитика" },
-];
+import { useAuth } from "../hooks/useAuth";
 
 export default function Sidebar() {
+  const { isAdmin } = useAuth();
+
+  const items = [
+    { to: "/", label: "Главная" },
+    { to: "/genres", label: "Жанры" },
+    { to: "/favorites", label: "Избранное" },
+    { to: "/history", label: "История" },
+    { to: "/profile", label: "Профиль" },
+    { to: "/settings", label: "Настройки" },
+    { to: "/subscription", label: "Подписка" },
+  ];
+
+  if (isAdmin) {
+    items.push({ to: "/add-movie", label: "Добавить фильм" });
+    items.push({ to: "/admin/movies", label: "Админ: фильмы" });
+    items.push({ to: "/analytics", label: "Аналитика" });
+  }
+
   return (
     <nav className="sidebar-nav">
       <ul className="navlist">

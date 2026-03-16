@@ -17,6 +17,11 @@ export const addFromKinopoisk = async (kinopoiskId) => {
   return res.data;
 };
 
+export const deleteMovie = async (id) => {
+  const res = await http.delete(`/movies/${id}`);
+  return res.data;
+};
+
 export const getAllGenres = async () => {
   const res = await http.get("/genres");
   return res.data;

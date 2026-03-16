@@ -60,6 +60,20 @@ function readAuthFromStorage() {
   };
 }
 
+function isAdminProfile(profile) {
+  if (!profile) return false;
+  const roles = profile.roles || profile.authorities || profile.role || profile.roles?.map?.((r) => r?.authority);
+  if (Array.isArray(roles)) {
+    return roles.some((r) =>
+      String(r).toLowerCase().includes("admin")
+    );
+  }
+  if (typeof roles === "string") {
+    return roles.toLowerCase().includes("admin");
+  }
+  return false;
+}
+
 async function fetchProfileApi() {
   const { data } = await http.get("/profile/me");
   const username = data.nickname || data.username || data.email;
@@ -239,9 +253,12 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener("storage", handler);
   }, []);
 
+  const isAdmin = Boolean(isAdminProfile(user?.profile) || isAdminProfile(user?.raw) || isAdminProfile(user?.roles));
+
   const value = {
     user,
     isAuthenticated: !!user,
+    isAdmin,
     isLoading,
     error,
     login,

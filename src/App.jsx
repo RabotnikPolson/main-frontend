@@ -3,6 +3,7 @@ import React, { lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import AppLayout from "./layouts/AppLayout";
 import { ThemeProvider } from "./hooks/useTheme";
+import AdminRoute from "./components/AdminRoute";
 import "./styles/theme.css";
 
 // Ленивые импорты страниц
@@ -21,6 +22,7 @@ const SubscriptionPage = lazy(() => import("./pages/SubscriptionPage"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const UserActivityPage = lazy(() => import("./pages/UserActivityPage")); // <- новая страница
+const AdminMovies = lazy(() => import("./pages/AdminMovies"));
 
 function ScrollToTop() {
   const location = useLocation();
@@ -40,10 +42,11 @@ export default function App() {
             {/* Основные страницы */}
             <Route index element={<Home />} />
             <Route path="genres" element={<Genres />} />
-            <Route path="add-movie" element={<AddMovie />} />
+            <Route path="add-movie" element={<AdminRoute><AddMovie /></AdminRoute>} />
+            <Route path="admin/movies" element={<AdminRoute><AdminMovies /></AdminRoute>} />
             <Route path="favorites" element={<Favorites />} />
             <Route path="history" element={<History />} />
-            <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="settings" element={<Settings />} />
             <Route path="subscription" element={<SubscriptionPage />} />

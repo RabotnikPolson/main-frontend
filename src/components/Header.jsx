@@ -166,6 +166,9 @@ export default function Header() {
         <div className="header-right">
           {user ? (
             <>
+              {user?.profile && user?.profile?.roles && String(user.profile.roles).toLowerCase().includes("admin") ? (
+                <Link to="/admin/movies" className="auth-link">Админка</Link>
+              ) : null}
               <Link to="/profile" className="profile-link">@{user.username}</Link>
               <button type="button" className="logout-btn" onClick={logout}>Выйти</button>
             </>
