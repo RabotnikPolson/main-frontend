@@ -6,7 +6,7 @@ import ReviewCard from "../components/ReviewCard";
 import ReviewFormModal from "../components/ReviewFormModal";
 import ReviewReadModal from "../components/ReviewReadModal";
 import CommentsSection from "../components/comments/CommentsSection";
-import RecommendationsRail from "../components/RightRail/RecommendationsRail";
+import RightRailTabs from "../components/RightRail/RightRailTabs";
 import WatchTracker from "../components/WatchTracker";
 
 import { useMovie } from "../hooks/useMovie";
@@ -206,9 +206,9 @@ export default function MovieWatch() {
           </div>
         </div>
 
-        {!!imdbId && (
-          <div className="watch-sidebar">
-            <RecommendationsRail imdbId={imdbId} />
+        {!!movieId && (
+          <div className="watch-sidebar" style={{ position: "sticky", top: 20, height: "calc(100vh - 40px)", overflow: "hidden" }}>
+            <RightRailTabs movieId={movieId} />
           </div>
         )}
       </div>

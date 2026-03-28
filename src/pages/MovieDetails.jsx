@@ -4,12 +4,80 @@ import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useMovie } from "../hooks/useMovie";
 import { useAuth } from "../hooks/useAuth";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { useRecommendationsTab } from "../hooks/useRecommendations";
 import {
   getFavoritesByUser,
   addFavorite,
   removeFavorite,
 } from "../shared/api/favorites";
 import "../styles/pages/MovieDetails.css";
+
+function RecommendationTabs({ movieId }) {
+  const tabs = [
+    { id: "franchise", label: "Продолжение" },
+    { id: "content", label: "Похожие (AI)" },
+    { id: "director", label: "Режиссер" },
+    { id: "actor", label: "Актеры" },
+    { id: "genre", label: "По жанру" },
+    { id: "collaborative-item", label: "Смотрят также" },
+  ];
+
+  const [activeTab, setActiveTab] = useState("franchise");
+  const { data, isLoading } = useRecommendationsTab(activeTab, movieId, 6);
+
+  const items = data?.recommendations || [];
+
+  return (
+    <div className="recommendation-tabs" style={{ marginTop: 40 }}>
+      <h3 style={{ marginBottom: 16 }}>Рекомендации для вас</h3>
+      <div className="tabs-header" style={{ display: "flex", gap: 12, borderBottom: "1px solid var(--border)", marginBottom: 16, overflowX: "auto", paddingBottom: 8 }}>
+        {tabs.map(t => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            style={{
+              padding: "8px 16px",
+              background: activeTab === t.id ? "var(--primary)" : "transparent",
+              color: activeTab === t.id ? "#fff" : "var(--text-secondary)",
+              border: "none",
+              borderRadius: 6,
+              cursor: "pointer",
+              fontWeight: 600,
+              whiteSpace: "nowrap"
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {isLoading ? (
+        <div style={{ color: "var(--text-secondary)" }}>Загрузка похожих фильмов...</div>
+      ) : items.length === 0 ? (
+        <div style={{ color: "var(--text-secondary)" }}>В этой категории пока нет рекомендаций.</div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 16 }}>
+          {items.map(m => {
+            const posterSrc = m.poster_url || `https://placehold.jp/333/fff/300x450.png?text=${encodeURIComponent(m.title)}`;
+            return (
+            <Link key={m.movie_id} to={`/movie/${m.movie_id}`} style={{ textDecoration: "none", color: "inherit" }} onClick={() => window.scrollTo(0,0)}>
+              <div style={{ borderRadius: 8, overflow: "hidden", aspectRatio: "2/3", background: "var(--surface)", border: "1px solid var(--border)" }}>
+                <img 
+                  src={posterSrc} 
+                  alt={m.title} 
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                  onError={(e) => { e.currentTarget.src = "https://placehold.jp/333/fff/300x450.png?text=No+Image"; }}
+                />
+              </div>
+              <div style={{ marginTop: 8, fontSize: 13, fontWeight: 500, lineHeight: 1.2 }}>{m.title}</div>
+              {m.reason && <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>{m.reason}</div>}
+            </Link>
+          )})}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function MovieDetails() {
   const { id } = useParams();
@@ -135,7 +203,7 @@ export default function MovieDetails() {
 
   const posterSrc =
     movie.poster ||
-    `https://via.placeholder.com/400x600/333/fff?text=${encodeURIComponent(
+    `https://placehold.jp/333/fff/400x600.png?text=${encodeURIComponent(
       movie.title
     )}`;
 
@@ -154,7 +222,7 @@ export default function MovieDetails() {
             loading="lazy"
             onError={(e) => {
               e.currentTarget.src =
-                "https://via.placeholder.com/400x600/333/fff?text=No+Image";
+                "https://placehold.jp/333/fff/400x600.png?text=No+Image";
             }}
           />
 
@@ -214,6 +282,9 @@ export default function MovieDetails() {
           </div>
         </div>
       </div>
+
+      {/* NEW RECOMMENDATION TABS SECTION */}
+      <RecommendationTabs movieId={movie.id} />
     </div>
   );
 }

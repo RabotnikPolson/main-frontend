@@ -65,7 +65,7 @@ export default function History() {
             <img
               src={
                 i.posterUrl ||
-                `https://via.placeholder.com/200x300/333/fff?text=${encodeURIComponent(
+                `https://placehold.jp/333/fff/200x300.png?text=${encodeURIComponent(
                   i.title
                 )}`
               }

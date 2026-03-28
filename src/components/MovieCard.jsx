@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export default function MovieCard({ movie }) {
   const poster =
     movie.poster ||
-    `https://via.placeholder.com/300x450/333/fff?text=${encodeURIComponent(
+    `https://placehold.jp/333/fff/300x450.png?text=${encodeURIComponent(
       movie.title
     )}`;
 
@@ -17,7 +17,7 @@ export default function MovieCard({ movie }) {
           loading="lazy"
           onError={(e) => {
             e.currentTarget.src =
-              "https://via.placeholder.com/300x450/333/fff?text=No+Image";
+              "https://placehold.jp/333/fff/300x450.png?text=No+Image";
           }}
         />
       </div>

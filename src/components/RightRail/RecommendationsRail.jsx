@@ -10,7 +10,9 @@ export default function RecommendationsRail({ imdbId }) {
   if (error)
     return <div style={{ color: "#8a8f98" }}>Ошибка загрузки рекомендаций</div>;
 
-  const items = Array.isArray(data?.items)
+  const items = Array.isArray(data?.recommendations)
+    ? data.recommendations
+    : Array.isArray(data?.items)
     ? data.items
     : Array.isArray(data)
     ? data
@@ -30,7 +32,7 @@ export default function RecommendationsRail({ imdbId }) {
           const poster =
             m.posterUrl ||
             m.poster ||
-            `https://via.placeholder.com/120x68/16181d/ffffff?text=${encodeURIComponent(
+            `https://placehold.jp/16181d/ffffff/120x68.png?text=${encodeURIComponent(
               m.title || ""
             )}`;
           return (
@@ -58,7 +60,10 @@ export default function RecommendationsRail({ imdbId }) {
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600 }}>{m.title}</div>
                 {m.year && (
-                  <div style={{ fontSize: 12, color: "#8a8f98" }}>{m.year}</div>
+                  <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{m.year}</div>
+                )}
+                {m.reason && (
+                  <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>{m.reason}</div>
                 )}
               </div>
             </Link>
