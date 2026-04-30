@@ -12,6 +12,21 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      onwarn(warning, warn) {
+        if (
+          warning.code === "MODULE_LEVEL_DIRECTIVE" &&
+          typeof warning.id === "string" &&
+          warning.id.includes("node_modules")
+        ) {
+          return;
+        }
+
+        warn(warning);
+      },
+    },
+  },
   server: {
     port: 5173,
     strictPort: true,

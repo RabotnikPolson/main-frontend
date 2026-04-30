@@ -6,7 +6,7 @@ import { useMovies } from "@/features/movies";
 import { useSmartFeed } from "@/features/recommendations";
 import "@/shared/styles/components/HeroCarousel.css";
 import "swiper/css";
-import "swiper/css/navigation";
+import "swiper/element/css/navigation";
 
 export default function HomeHeroCarousel() {
   const navigate = useNavigate();

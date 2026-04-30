@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import Hls from "hls.js";
 import api from "@/shared/api/http-client";
 
 export default function WatchTracker({ url, movieId }) {
@@ -12,16 +11,30 @@ export default function WatchTracker({ url, movieId }) {
     if (!video || !url) return;
 
     let hls;
+    let disposed = false;
 
-    if (Hls.isSupported() && url.includes(".m3u8")) {
-      hls = new Hls();
-      hls.loadSource(url);
-      hls.attachMedia(video);
-    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    const attachPlayer = async () => {
+      if (url.includes(".m3u8")) {
+        const { default: Hls } = await import("hls.js/light");
+        if (disposed) {
+          return;
+        }
+
+        if (Hls.isSupported()) {
+          hls = new Hls();
+          hls.loadSource(url);
+          hls.attachMedia(video);
+          return;
+        }
+      }
+
       video.src = url;
-    } else {
+    };
+
+    attachPlayer().catch((err) => {
+      console.error(err);
       video.src = url;
-    }
+    });
 
     const interval = setInterval(() => {
       if (video.paused || video.ended) return;
@@ -43,6 +56,7 @@ export default function WatchTracker({ url, movieId }) {
     }, 5000);
 
     return () => {
+      disposed = true;
       clearInterval(interval);
       if (hls) {
         hls.destroy();
