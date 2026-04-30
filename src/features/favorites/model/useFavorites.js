@@ -1,31 +1,33 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  getMyFavorites,
-  addFavoriteByImdb,
-  removeFavoriteByImdb,
-} from "../shared/api/favorites";
-import { mapMovie } from "../entities/movie/mapper";
+  addFavorite,
+  getFavoritesByUser,
+  removeFavorite,
+} from "@/features/favorites/api/favoritesApi";
 
-export function useFavorites() {
+export function useFavorites(userId) {
   const qc = useQueryClient();
+  const queryKey = ["favorites", userId];
 
-  const favs = useQuery({
-    queryKey: ["favorites", "me"],
-    queryFn: async () => {
-      const arr = await getMyFavorites();
-      return Array.isArray(arr) ? arr.map(mapMovie) : [];
-    },
+  const favorites = useQuery({
+    queryKey,
+    queryFn: () => getFavoritesByUser(userId),
+    enabled: !!userId,
   });
 
   const add = useMutation({
-    mutationFn: addFavoriteByImdb,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", "me"] }),
+    mutationFn: (movieId) => addFavorite(userId, movieId),
+    onSuccess: () => qc.invalidateQueries({ queryKey }),
   });
 
   const remove = useMutation({
-    mutationFn: removeFavoriteByImdb,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", "me"] }),
+    mutationFn: (movieId) => removeFavorite(userId, movieId),
+    onSuccess: () => qc.invalidateQueries({ queryKey }),
   });
 
-  return { ...favs, add: add.mutateAsync, remove: remove.mutateAsync };
+  return {
+    ...favorites,
+    add: add.mutateAsync,
+    remove: remove.mutateAsync,
+  };
 }

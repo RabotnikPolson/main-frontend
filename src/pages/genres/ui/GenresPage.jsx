@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { useGenres } from "../../shared/hooks/useGenres";
-import { useMovies } from "../../features/movies/model/useMovies";
-import MovieGrid from "../../shared/ui/MovieGrid";
-import "../../shared/styles/pages/Genres.css";
+import { useGenres, useMovies } from "@/features/movies";
+import { MovieGrid } from "@/shared/ui";
+import "@/shared/styles/pages/Genres.css";
 
 export default function GenresPage() {
   const { data: genres = [] } = useGenres();
@@ -10,25 +9,23 @@ export default function GenresPage() {
   const [selected, setSelected] = useState(null);
 
   const filtered = selected
-    ? movies.filter(m =>
-        (m.genre || "").toLowerCase().includes(selected.toLowerCase())
+    ? movies.filter((movie) =>
+        (movie.genre || "").toLowerCase().includes(selected.toLowerCase())
       )
     : movies;
 
   return (
     <div className="container genres-page">
-      <h1>Жанры</h1>
+      <h1>Р–Р°РЅСЂС‹</h1>
 
       <div className="genres-row">
-        {genres.map(g => (
+        {genres.map((genre) => (
           <button
-            key={g.id}
-            className={`chip ${selected === g.name ? "active" : ""}`}
-            onClick={() =>
-              setSelected(selected === g.name ? null : g.name)
-            }
+            key={genre.id}
+            className={`chip ${selected === genre.name ? "active" : ""}`}
+            onClick={() => setSelected(selected === genre.name ? null : genre.name)}
           >
-            {g.name}
+            {genre.name}
           </button>
         ))}
       </div>

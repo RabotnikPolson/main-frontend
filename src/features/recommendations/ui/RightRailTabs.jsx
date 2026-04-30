@@ -1,7 +1,7 @@
 // src/components/RightRail/RightRailTabs.jsx
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecommendationsTab } from "../../hooks/useRecommendations";
+import { useRecommendationsTab } from "@/features/recommendations/model/useRecommendations";
 
 export default function RightRailTabs({ movieId }) {
 const tabs = [

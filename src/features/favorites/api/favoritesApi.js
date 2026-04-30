@@ -1,4 +1,4 @@
-import http from "./http";
+import http from "@/shared/api/http-client";
 
 export const getFavoritesByUser = async (userId) => {
   const res = await http.get(`/watchlists/user/${userId}`);

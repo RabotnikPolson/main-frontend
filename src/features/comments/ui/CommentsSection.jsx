@@ -5,8 +5,8 @@ import {
   useReplies,
   useCommentCount,
   useCommentMutations,
-} from "../../hooks/useComments";
-import "../../styles/components/comments.css";
+} from "@/features/comments/model/useComments";
+import "@/shared/styles/components/comments.css";
 
 function SortDropdown({ value, onChange }) {
   const [open, setOpen] = useState(false);

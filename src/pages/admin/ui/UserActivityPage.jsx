@@ -1,18 +1,13 @@
-// src/pages/UserActivityPage.jsx
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import http from "../shared/api/http";
-
-import ReviewCard from "../components/ReviewCard";
-import CommentItem from "../components/comments/CommentItem";
-
-import "../styles/pages/Profile.css";
+import { CommentItem } from "@/features/comments";
+import { ReviewCard } from "@/features/reviews";
+import http from "@/shared/api/http-client";
+import "@/shared/styles/pages/Profile.css";
 
 export default function UserActivityPage() {
   const { username } = useParams();
-
-  // Мутации / удаление можно подключить позже через Review/Comment API
   const [editingReview, setEditingReview] = useState(null);
 
   const { data, isLoading, isError } = useQuery({
@@ -23,11 +18,14 @@ export default function UserActivityPage() {
         http.get(`/comments/user/${username}`),
       ]);
 
-      const reviews = (reviewsRes.data || []).map((r) => ({ ...r, type: "review" }));
-      const comments = (commentsRes.data || []).map((c) => ({ ...c, type: "comment" }));
-
+      const reviews = (reviewsRes.data || []).map((item) => ({ ...item, type: "review" }));
+      const comments = (commentsRes.data || []).map((item) => ({ ...item, type: "comment" }));
       const combined = [...reviews, ...comments];
-      combined.sort((a, b) => new Date(b.ts || b.createdAt) - new Date(a.ts || a.createdAt));
+
+      combined.sort(
+        (left, right) => new Date(right.ts || right.createdAt) - new Date(left.ts || left.createdAt)
+      );
+
       return combined;
     },
     retry: 1,
@@ -35,26 +33,34 @@ export default function UserActivityPage() {
 
   const openReview = (review) => setEditingReview(review);
 
-  if (isLoading) return <p className="profile-muted">Загрузка…</p>;
-  if (isError) return <p className="profile-muted">Не удалось загрузить активность.</p>;
-  if (!data || data.length === 0) return <p className="profile-muted">Нет активности.</p>;
+  if (isLoading) {
+    return <p className="profile-muted">Р—Р°РіСЂСѓР·РєР°...</p>;
+  }
+
+  if (isError) {
+    return <p className="profile-muted">РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ Р°РєС‚РёРІРЅРѕСЃС‚СЊ.</p>;
+  }
+
+  if (!data || data.length === 0) {
+    return <p className="profile-muted">РќРµС‚ Р°РєС‚РёРІРЅРѕСЃС‚Рё.</p>;
+  }
 
   return (
     <div className="container profile-page">
       <div className="profile-shell">
-        <h1 className="profile-title">Активность пользователя {username}</h1>
+        <h1 className="profile-title">РђРєС‚РёРІРЅРѕСЃС‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ {username}</h1>
 
         <div className="profile-card">
-          {data.map((item, idx) => {
+          {data.map((item, index) => {
             if (item.type === "review") {
               return (
                 <ReviewCard
-                  key={`review-${item.id || idx}`}
+                  key={`review-${item.id || index}`}
                   review={item}
                   onReadFull={openReview}
-                  isOwner={true} // или false, если чужой пользователь
+                  isOwner
                   onEdit={() => setEditingReview(item)}
-                  onDelete={() => alert("Удалить отзыв " + item.id)}
+                  onDelete={() => alert(`РЈРґР°Р»РёС‚СЊ РѕС‚Р·С‹РІ ${item.id}`)}
                 />
               );
             }
@@ -62,12 +68,12 @@ export default function UserActivityPage() {
             if (item.type === "comment") {
               return (
                 <CommentItem
-                  key={`comment-${item.id || idx}`}
+                  key={`comment-${item.id || index}`}
                   node={item}
                   isReply={false}
-                  onReply={(text) => alert(`Ответ на комментарий ${item.id}: ${text}`)}
-                  onDelete={() => alert("Удалить комментарий " + item.id)}
-                  onReact={(emoji) => alert(`Реакция ${emoji} на комментарий ${item.id}`)}
+                  onReply={(text) => alert(`РћС‚РІРµС‚ ${item.id}: ${text}`)}
+                  onDelete={() => alert(`РЈРґР°Р»РёС‚СЊ РєРѕРјРјРµРЅС‚Р°СЂРёР№ ${item.id}`)}
+                  onReact={(emoji) => alert(`Р РµР°РєС†РёСЏ ${emoji} РЅР° ${item.id}`)}
                 />
               );
             }

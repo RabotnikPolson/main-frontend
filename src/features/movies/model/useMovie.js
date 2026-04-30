@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getMovie } from "../shared/api/movies";
-import { mapMovie } from "../entities/movie/mapper";
+import { mapMovie } from "@/entities/movie";
+import { getMovie } from "@/features/movies/api/moviesApi";
 
 export const useMovie = (id) =>
   useQuery({

@@ -1,4 +1,4 @@
-import http from "./http";
+import http from "@/shared/api/http-client";
 
 export const getAllMovies = async () => {
   const res = await http.get("/movies");

@@ -3,8 +3,8 @@ import {
   listRightRail,
   getSmartFeed,
   listRecommendationsByTab,
-  listDomesticRecommendations
-} from "../../shared/api/recommendations";
+  listDomesticRecommendations,
+} from "@/features/recommendations/api/recommendationsApi";
 
 export const useRecommendationsTab = (type, movieId, limit = 15) =>
   useQuery({

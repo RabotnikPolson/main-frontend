@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import "../styles/components/reviewModal.css";
+import "@/shared/styles/components/reviewModal.css";
 
 function StarRating({ value, onChange }) {
   const [hover, setHover] = useState(0);

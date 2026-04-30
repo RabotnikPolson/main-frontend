@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
+import Header from "@/app/ui/Header";
+import Sidebar from "@/app/ui/Sidebar";
 
 export default function AppLayout() {
   const loc = useLocation();
@@ -19,7 +19,7 @@ export default function AppLayout() {
         )}
 
         <main className="main">
-          <React.Suspense fallback={<div className="loading">Загрузка…</div>}>
+          <React.Suspense fallback={<div className="loading">Р—Р°РіСЂСѓР·РєР°...</div>}>
             <Outlet />
           </React.Suspense>
         </main>

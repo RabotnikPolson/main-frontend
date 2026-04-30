@@ -1,4 +1,4 @@
-import http from "./http";
+import http from "@/shared/api/http-client";
 
 export const listRecommendationsByTab = async (type, movieId, limit = 15) => {
   const response = await http.get(`/api/v1/recommendations/tab/${type}/${movieId}?limit=${limit}`);

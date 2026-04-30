@@ -7,7 +7,7 @@ import {
   updateComment,
   deleteComment,
   reactComment,
-} from "../shared/api/comments";
+} from "@/features/comments/api/commentsApi";
 
 /**
  * Корневые комментарии

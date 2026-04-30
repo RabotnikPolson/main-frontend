@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../model/useAuth";
+import { useAuth } from "@/features/auth/model/useAuth";
 
 export default function AdminRoute({ children }) {
   const { isAuthenticated, isAdmin, isLoading } = useAuth();

@@ -1,5 +1,4 @@
-// src/shared/api/reviews.js
-import http from "./http";
+import http from "@/shared/api/http-client";
 
 export async function listByMovie(movieId, { page = 0, size = 5, sort = "createdAt,desc" } = {}) {
     const { data } = await http.get(`/reviews/movie/${movieId}`, {

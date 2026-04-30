@@ -1,6 +1,6 @@
 // src/components/RightRail/RecommendationsRail.jsx
 import { Link } from "react-router-dom";
-import { useRightRail } from "../../hooks/useRecommendations";
+import { useRightRail } from "@/features/recommendations/model/useRecommendations";
 
 export default function RecommendationsRail({ imdbId }) {
   const { data, isLoading, error } = useRightRail(imdbId, 15);

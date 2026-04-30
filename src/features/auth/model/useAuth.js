@@ -7,13 +7,13 @@ import React, {
   useCallback,
 } from "react";
 
-import http from "../../shared/api/http-client";
+import http from "@/shared/api/http-client";
 import {
   login as apiLogin,
   register as apiRegister,
   logout as apiLogout,
   refresh as apiRefresh,
-} from "../../shared/api/auth";
+} from "@/features/auth/api/authApi";
 
 const AuthContext = createContext(null);
 

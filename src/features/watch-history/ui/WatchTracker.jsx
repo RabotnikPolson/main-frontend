@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import Hls from "hls.js";
-import api from "../shared/api/http";
+import api from "@/shared/api/http-client";
 
 export default function WatchTracker({ url, movieId }) {
   const videoRef = useRef(null);

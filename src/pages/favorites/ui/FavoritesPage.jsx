@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import MovieGrid from "../components/MovieGrid";
-import { useMovies } from "../hooks/useMovies";
-import { useAuth } from "../hooks/useAuth";
-import { useUserProfile } from "../hooks/useUserProfile";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/features/auth";
 import {
-  getFavoritesByUser,
   addFavorite,
+  getFavoritesByUser,
   removeFavorite,
-} from "../shared/api/favorites";
-import "../styles/pages/Favorites.css";
+} from "@/features/favorites";
+import { useMovies } from "@/features/movies";
+import { useUserProfile } from "@/features/user-profile";
+import { MovieGrid } from "@/shared/ui";
+import "@/shared/styles/pages/Favorites.css";
 
 const localKey = (user = "guest") => `favorites_${user}`;
 
-export default function Favorites() {
+export default function FavoritesPage() {
   const qc = useQueryClient();
   const { data: movies = [] } = useMovies();
   const { user } = useAuth();
@@ -27,9 +27,12 @@ export default function Favorites() {
   } = useQuery({
     queryKey: ["favorites", userId],
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId) {
+        return [];
+      }
+
       const data = await getFavoritesByUser(userId);
-      return Array.isArray(data) ? data.map((w) => w.movieId) : [];
+      return Array.isArray(data) ? data.map((item) => item.movieId) : [];
     },
     enabled: !!username && !!userId,
     staleTime: 30000,
@@ -37,18 +40,12 @@ export default function Favorites() {
 
   const addMut = useMutation({
     mutationFn: (movieId) => addFavorite(userId, movieId),
-    onSuccess: () =>
-      qc.invalidateQueries({
-        queryKey: ["favorites", userId],
-      }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", userId] }),
   });
 
   const delMut = useMutation({
     mutationFn: (movieId) => removeFavorite(userId, movieId),
-    onSuccess: () =>
-      qc.invalidateQueries({
-        queryKey: ["favorites", userId],
-      }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", userId] }),
   });
 
   const [localFavs, setLocalFavs] = useState(() => {
@@ -68,7 +65,7 @@ export default function Favorites() {
   }, [localFavs, username]);
 
   const favIds = username && userId ? remoteFavsRaw : localFavs;
-  const favMovies = movies.filter((m) => favIds.includes(m.id));
+  const favMovies = movies.filter((movie) => favIds.includes(movie.id));
 
   const toggle = (movieId) => {
     if (username && userId) {
@@ -82,19 +79,19 @@ export default function Favorites() {
 
     setLocalFavs((prev) =>
       prev.includes(movieId)
-        ? prev.filter((x) => x !== movieId)
+        ? prev.filter((value) => value !== movieId)
         : [movieId, ...prev]
     );
   };
 
   return (
     <div className="container favorites-page">
-      <h1>Избранное</h1>
+      <h1>РР·Р±СЂР°РЅРЅРѕРµ</h1>
 
-      {username && favsLoading && <div className="loading">Загрузка…</div>}
+      {username && favsLoading && <div className="loading">Р—Р°РіСЂСѓР·РєР°...</div>}
 
       {favMovies.length === 0 ? (
-        <div className="empty">Пусто</div>
+        <div className="empty">РџСѓСЃС‚Рѕ</div>
       ) : (
         <MovieGrid movies={favMovies} onToggleFavorite={toggle} />
       )}

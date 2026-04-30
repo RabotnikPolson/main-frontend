@@ -4,8 +4,8 @@ import {
   deleteReview,
   listByMovie,
   updateReview,
-} from "../shared/api/reviews";
-import { rateMovie } from "../shared/api/ratings";
+} from "@/features/reviews/api/reviewsApi";
+import { rateMovie } from "@/features/reviews/api/ratingsApi";
 
 const reviewKeys = {
   all: ['reviews'],

@@ -1,5 +1,4 @@
-// src/shared/api/ratings.js
-import http from "./http";
+import http from "@/shared/api/http-client";
 
 export async function rateMovie(movieId, score) {
     // бэк ждёт score 1..10 (Short)

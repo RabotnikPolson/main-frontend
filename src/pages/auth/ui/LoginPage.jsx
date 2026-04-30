@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { useAuth } from "../hooks/useAuth";
-import "../styles/pages/Auth.css";
+import { useAuth } from "@/features/auth";
+import "@/shared/styles/pages/Auth.css";
 
-export default function Login() {
+export default function LoginPage() {
   const nav = useNavigate();
   const loc = useLocation();
   const { login } = useAuth();
-
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -17,30 +16,30 @@ export default function Login() {
   const from = loc.state?.from?.pathname || "/";
 
   const mutation = useMutation({
-    mutationFn: payload => login(payload),
+    mutationFn: (payload) => login(payload),
     onSuccess: () => {
       nav(from, { replace: true });
     },
   });
 
-  const handleChange = e => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = e => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
     mutation.mutate({ ...form });
   };
 
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Вход</h1>
+        <h1>Р’С…РѕРґ</h1>
 
         {mutation.isError && (
           <div className="error">
-            Не удалось войти. Проверьте email и пароль.
+            РќРµ СѓРґР°Р»РѕСЃСЊ РІРѕР№С‚Рё. РџСЂРѕРІРµСЂСЊС‚Рµ email Рё РїР°СЂРѕР»СЊ.
           </div>
         )}
 
@@ -59,22 +58,22 @@ export default function Login() {
             className="input"
             type="password"
             name="password"
-            placeholder="Пароль"
+            placeholder="РџР°СЂРѕР»СЊ"
             value={form.password}
             onChange={handleChange}
             autoComplete="current-password"
             required
           />
-          <button className="button" type="submit" disabled={mutation.isLoading}>
-            {mutation.isLoading ? "Входим…" : "Войти"}
+          <button className="button" type="submit" disabled={mutation.isPending}>
+            {mutation.isPending ? "Р’С…РѕРґРёРј..." : "Р’РѕР№С‚Рё"}
           </button>
         </form>
 
         <div className="auth-switch">
           <small>
-            Нет аккаунта?{" "}
+            РќРµС‚ Р°РєРєР°СѓРЅС‚Р°?{" "}
             <Link to="/register" state={{ from }}>
-              Зарегистрироваться
+              Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊСЃСЏ
             </Link>
           </small>
         </div>

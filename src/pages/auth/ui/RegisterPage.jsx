@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { useAuth } from "../hooks/useAuth";
-import "../styles/pages/Auth.css";
+import { useAuth } from "@/features/auth";
+import "@/shared/styles/pages/Auth.css";
 
-export default function Register() {
+export default function RegisterPage() {
   const nav = useNavigate();
   const { register } = useAuth();
-
   const [form, setForm] = useState({
     email: "",
     username: "",
@@ -21,23 +20,23 @@ export default function Register() {
     },
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleChange = (event) => {
+    const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
     mutation.mutate({ ...form });
   };
 
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Регистрация</h1>
+        <h1>Р РµРіРёСЃС‚СЂР°С†РёСЏ</h1>
 
         {mutation.isError && (
-          <p className="error">Не удалось создать аккаунт.</p>
+          <p className="error">РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ Р°РєРєР°СѓРЅС‚.</p>
         )}
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -55,7 +54,7 @@ export default function Register() {
             className="input"
             type="text"
             name="username"
-            placeholder="Логин"
+            placeholder="Р›РѕРіРёРЅ"
             value={form.username}
             onChange={handleChange}
             autoComplete="username"
@@ -67,15 +66,15 @@ export default function Register() {
             className="input"
             type="password"
             name="password"
-            placeholder="Пароль"
+            placeholder="РџР°СЂРѕР»СЊ"
             value={form.password}
             onChange={handleChange}
             autoComplete="new-password"
             minLength={6}
             required
           />
-          <button className="button" type="submit" disabled={mutation.isLoading}>
-            {mutation.isLoading ? "Создаём…" : "СОЗДАТЬ АККАУНТ"}
+          <button className="button" type="submit" disabled={mutation.isPending}>
+            {mutation.isPending ? "РЎРѕР·РґР°РµРј..." : "РЎРћР—Р”РђРўР¬ РђРљРљРђРЈРќРў"}
           </button>
         </form>
       </div>

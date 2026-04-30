@@ -1,40 +1,30 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import http from '../shared/api/http-client';
-// useAuth находится в этой же директории
-import { useAuth } from './useAuth';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/features/auth";
+import http from "@/shared/api/http-client";
 
-/**
- * useUserSettings hook
- *
- * Этот хук обёртывает обращения к API для чтения и обновления настроек пользователя.
- * Настройки доступны только для текущего аутентифицированного пользователя; для других
- * пользователей они не загружаются. Если переданное имя пользователя не совпадает
- * с логином текущего пользователя, хук вернёт `null` в данных. При успешном обновлении
- * инвалидирует кеш.
- *
- * @param {string} username Имя пользователя, чьи настройки нужно загрузить.
- */
 export const useUserSettings = (username) => {
   const qc = useQueryClient();
   const { user } = useAuth();
-  const isMe = !!username && user?.username === username;
+  const resolvedUsername = username || user?.username || null;
+  const isMe = !!resolvedUsername && user?.username === resolvedUsername;
+  const key = ["user", resolvedUsername || "me", "settings"];
 
-  const key = ['user', username, 'settings'];
-
-  const q = useQuery({
+  const query = useQuery({
     queryKey: key,
     queryFn: async () => {
-      // Настройки доступны только для себя
-      if (!isMe) return null;
-      const res = await http.get('/settings/me');
+      if (!isMe) {
+        return null;
+      }
+
+      const res = await http.get("/settings/me");
       return res.data;
     },
     enabled: isMe,
   });
 
-  const m = useMutation({
+  const mutation = useMutation({
     mutationFn: async (payload) => {
-      const res = await http.put('/settings/me', payload);
+      const res = await http.put("/settings/me", payload);
       return res.data;
     },
     onSuccess: () => {
@@ -43,9 +33,9 @@ export const useUserSettings = (username) => {
   });
 
   return {
-    ...q,
-    save: m.mutateAsync,
-    saveStatus: m.status,
-    saveError: m.error,
+    ...query,
+    save: mutation.mutateAsync,
+    saveStatus: mutation.status,
+    saveError: mutation.error,
   };
 };
