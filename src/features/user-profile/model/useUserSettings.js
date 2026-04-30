@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import http from '../shared/api/http';
+import http from '../shared/api/http-client';
 // useAuth находится в этой же директории
 import { useAuth } from './useAuth';
 

@@ -7,7 +7,7 @@ import React, {
   useCallback,
 } from "react";
 
-import http from "../../shared/api/http";
+import http from "../../shared/api/http-client";
 import {
   login as apiLogin,
   register as apiRegister,

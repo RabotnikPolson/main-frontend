@@ -1,6 +1,6 @@
 // src/hooks/useSubscription.js
 import { useQuery, useMutation } from "@tanstack/react-query";
-import http from "../shared/api/http";
+import http from "../shared/api/http-client";
 
 export const useSubscription = username => {
   const q = useQuery({
