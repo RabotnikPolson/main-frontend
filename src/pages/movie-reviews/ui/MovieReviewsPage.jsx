@@ -15,11 +15,11 @@ export default function MovieReviewsPage() {
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: 16 }}>
-      <h2>РћС‚Р·С‹РІС‹</h2>
+      <h2>Отзывы</h2>
 
-      {isLoading && <div>Р—Р°РіСЂСѓР·РєР°...</div>}
-      {isError && <div>РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РѕС‚Р·С‹РІРѕРІ</div>}
-      {!isLoading && !isError && items.length === 0 && <div>РћС‚Р·С‹РІРѕРІ РїРѕРєР° РЅРµС‚</div>}
+      {isLoading && <div>Загрузка...</div>}
+      {isError && <div>Ошибка загрузки отзывов</div>}
+      {!isLoading && !isError && items.length === 0 && <div>Отзывов пока нет</div>}
 
       <div style={{ display: "grid", gap: 12 }}>
         {items.map((review) => (
@@ -29,7 +29,7 @@ export default function MovieReviewsPage() {
 
       {hasMore && (
         <div style={{ marginTop: 12, textAlign: "center" }}>
-          <button onClick={() => setPage((value) => value + 1)}>Р—Р°РіСЂСѓР·РёС‚СЊ РµС‰С‘</button>
+          <button onClick={() => setPage((value) => value + 1)}>Загрузить ещё</button>
         </div>
       )}
     </div>

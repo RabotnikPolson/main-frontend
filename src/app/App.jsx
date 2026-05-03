@@ -1,8 +1,8 @@
 import React, { Suspense, lazy } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AdminRoute } from "@/features/auth";
-import { ThemeProvider } from "@/shared/hooks";
 import { AppLayout } from "@/app/ui";
+import { ThemeProvider } from "@/shared/hooks";
 import "@/shared/styles/theme.css";
 
 const HomePage = lazy(() => import("@/pages/home/ui/HomePage"));
@@ -36,7 +36,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <ScrollToTop />
-      <Suspense fallback={<div style={{ padding: 20 }}>Р—Р°РіСЂСѓР·РєР°...</div>}>
+      <Suspense fallback={<div style={{ padding: 20 }}>Загрузка...</div>}>
         <Routes>
           <Route element={<AppLayout />}>
             <Route index element={<HomePage />} />

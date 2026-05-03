@@ -14,12 +14,12 @@ import "@/shared/styles/pages/MovieDetails.css";
 
 function RecommendationTabs({ movieId }) {
   const tabs = [
-    { id: "franchise", label: "РџСЂРѕРґРѕР»Р¶РµРЅРёРµ" },
-    { id: "content", label: "РџРѕС…РѕР¶РёРµ (AI)" },
-    { id: "director", label: "Р РµР¶РёСЃСЃРµСЂ" },
-    { id: "actor", label: "РђРєС‚РµСЂС‹" },
-    { id: "genre", label: "РџРѕ Р¶Р°РЅСЂСѓ" },
-    { id: "collaborative-item", label: "РЎРјРѕС‚СЂСЏС‚ С‚Р°РєР¶Рµ" },
+    { id: "franchise", label: "Продолжение" },
+    { id: "content", label: "Похожие (AI)" },
+    { id: "director", label: "Режиссер" },
+    { id: "actor", label: "Актеры" },
+    { id: "genre", label: "По жанру" },
+    { id: "collaborative-item", label: "Смотрят также" },
   ];
 
   const [activeTab, setActiveTab] = useState("franchise");
@@ -28,7 +28,7 @@ function RecommendationTabs({ movieId }) {
 
   return (
     <div className="recommendation-tabs" style={{ marginTop: 40 }}>
-      <h3 style={{ marginBottom: 16 }}>Р РµРєРѕРјРµРЅРґР°С†РёРё РґР»СЏ РІР°СЃ</h3>
+      <h3 style={{ marginBottom: 16 }}>Рекомендации для вас</h3>
       <div
         className="tabs-header"
         style={{
@@ -61,9 +61,9 @@ function RecommendationTabs({ movieId }) {
       </div>
 
       {isLoading ? (
-        <div style={{ color: "var(--text-secondary)" }}>Р—Р°РіСЂСѓР·РєР°...</div>
+        <div style={{ color: "var(--text-secondary)" }}>Загрузка...</div>
       ) : items.length === 0 ? (
-        <div style={{ color: "var(--text-secondary)" }}>Р РµРєРѕРјРµРЅРґР°С†РёР№ РїРѕРєР° РЅРµС‚.</div>
+        <div style={{ color: "var(--text-secondary)" }}>Рекомендаций пока нет.</div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 16 }}>
           {items.map((movie) => {
@@ -202,15 +202,15 @@ export default function MovieDetailsPage() {
   };
 
   if (isLoading) {
-    return <div className="loading container">Р—Р°РіСЂСѓР·РєР° С„РёР»СЊРјР°...</div>;
+    return <div className="loading container">Загрузка фильма...</div>;
   }
 
   if (isError) {
     return (
       <div className="container">
-        <div className="error">РћС€РёР±РєР°: {error?.message || "РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ С„РёР»СЊРј"}</div>
+        <div className="error">Ошибка: {error?.message || "Не удалось загрузить фильм"}</div>
         <button className="button button--ghost" onClick={() => navigate(-1)}>
-          РќР°Р·Р°Рґ
+          Назад
         </button>
       </div>
     );
@@ -219,9 +219,9 @@ export default function MovieDetailsPage() {
   if (!movie) {
     return (
       <div className="container">
-        <div className="error">Р¤РёР»СЊРј РЅРµ РЅР°Р№РґРµРЅ</div>
+        <div className="error">Фильм не найден</div>
         <Link to="/" className="button button--ghost">
-          РќР° РіР»Р°РІРЅСѓСЋ
+          На главную
         </Link>
       </div>
     );
@@ -234,7 +234,7 @@ export default function MovieDetailsPage() {
   return (
     <div className="container details-page">
       <Link to="/" className="back-link">
-        РќР°Р·Р°Рґ
+        Назад
       </Link>
 
       <div className="details-layout">
@@ -256,11 +256,11 @@ export default function MovieDetailsPage() {
               onClick={toggleFavorite}
               disabled={addMut.isPending || delMut.isPending || favsLoading}
             >
-              {isFavorite ? "Р’ РёР·Р±СЂР°РЅРЅРѕРј" : "Р”РѕР±Р°РІРёС‚СЊ РІ РёР·Р±СЂР°РЅРЅРѕРµ"}
+              {isFavorite ? "В избранном" : "Добавить в избранное"}
             </button>
 
             <button className="button button--ghost" onClick={() => navigate(`/movie/${id}/watch`)}>
-              РЎРјРѕС‚СЂРµС‚СЊ
+              Смотреть
             </button>
           </div>
         </div>
@@ -269,31 +269,31 @@ export default function MovieDetailsPage() {
           <h2>{movie.title}</h2>
 
           <div className="meta">
-            <strong>Р“РѕРґ:</strong> {movie.year ?? "-"} · <strong>Р–Р°РЅСЂ:</strong> {movie.genre || "-"} ·{" "}
+            <strong>Год:</strong> {movie.year ?? "-"} · <strong>Жанр:</strong> {movie.genre || "-"} ·{" "}
             <strong>IMDb:</strong> {movie.imdbRating ?? "-"}
           </div>
 
           <p className="description">
-            <strong>РћРїРёСЃР°РЅРёРµ:</strong>
+            <strong>Описание:</strong>
             <br />
-            {movie.description || "РћРїРёСЃР°РЅРёРµ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚."}
+            {movie.description || "Описание отсутствует."}
           </p>
 
           <div className="more">
             <p>
-              <strong>Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ:</strong> {movie.runtime ?? "-"}
+              <strong>Длительность:</strong> {movie.runtime ?? "-"}
             </p>
             <p>
-              <strong>Р РµР¶РёСЃСЃРµСЂ:</strong> {movie.raw?.director || movie.raw?.Director || "-"}
+              <strong>Режиссер:</strong> {movie.raw?.director || movie.raw?.Director || "-"}
             </p>
             <p>
-              <strong>РђРєС‚С‘СЂС‹:</strong> {movie.raw?.actors || movie.raw?.Actors || "-"}
+              <strong>Актеры:</strong> {movie.raw?.actors || movie.raw?.Actors || "-"}
             </p>
             <p>
-              <strong>РЇР·С‹Рє:</strong> {movie.raw?.language || movie.raw?.Language || "-"}
+              <strong>Язык:</strong> {movie.raw?.language || movie.raw?.Language || "-"}
             </p>
             <p>
-              <strong>РЎС‚СЂР°РЅР°:</strong> {movie.raw?.country || movie.raw?.Country || "-"}
+              <strong>Страна:</strong> {movie.raw?.country || movie.raw?.Country || "-"}
             </p>
           </div>
         </div>

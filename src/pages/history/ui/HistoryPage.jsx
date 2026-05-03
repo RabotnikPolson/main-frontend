@@ -10,8 +10,8 @@ export default function HistoryPage() {
   if (!items.length) {
     return (
       <div className="container history-page">
-        <h1>РСЃС‚РѕСЂРёСЏ</h1>
-        <p className="muted">РџРѕРєР° РЅРµС‚ Р·Р°РїРёСЃРµР№</p>
+        <h1>История</h1>
+        <p className="muted">Пока нет записей</p>
       </div>
     );
   }
@@ -19,9 +19,9 @@ export default function HistoryPage() {
   return (
     <div className="container history-page">
       <div className="header-row">
-        <h1>РСЃС‚РѕСЂРёСЏ</h1>
+        <h1>История</h1>
         <button onClick={clear} className="button button--ghost">
-          РћС‡РёСЃС‚РёС‚СЊ
+          Очистить
         </button>
       </div>
 

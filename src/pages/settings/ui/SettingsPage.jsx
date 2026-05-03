@@ -52,23 +52,23 @@ export default function SettingsPage() {
 
   return (
     <div className="settings-page">
-      {isLoading && <div className="loading">Р—Р°РіСЂСѓР·РєР°...</div>}
-      {isError && <div className="error">РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РЅР°СЃС‚СЂРѕРµРє</div>}
+      {isLoading && <div className="loading">Загрузка...</div>}
+      {isError && <div className="error">Ошибка загрузки настроек</div>}
 
       <div className="settings-container">
         <div className="settings-section">
-          <h2>РќР°СЃС‚СЂРѕР№РєРё РїСЂРѕСЃРјРѕС‚СЂР°</h2>
+          <h2>Настройки просмотра</h2>
 
           <div className="settings-grid">
             <Link to="/history" className="setting-tile">
-              рџ“њ РСЃС‚РѕСЂРёСЏ РїСЂРѕСЃРјРѕС‚СЂРѕРІ
+              История просмотров
             </Link>
             <Link to="/favorites" className="setting-tile">
-              в­ђ РР·Р±СЂР°РЅРЅС‹Рµ
+              Избранное
             </Link>
 
             <div className="setting-row">
-              <label className="setting-label">РўРµРјР°</label>
+              <label className="setting-label">Тема</label>
               <select
                 className="setting-input"
                 value={settings.theme}
@@ -78,13 +78,13 @@ export default function SettingsPage() {
                   setTheme(value);
                 }}
               >
-                <option value="dark">РўС‘РјРЅР°СЏ</option>
-                <option value="light">РЎРІРµС‚Р»Р°СЏ</option>
+                <option value="dark">Темная</option>
+                <option value="light">Светлая</option>
               </select>
             </div>
 
             <div className="setting-row">
-              <label className="setting-label">РЇР·С‹Рє</label>
+              <label className="setting-label">Язык</label>
               <select
                 className="setting-input"
                 value={settings.language}
@@ -92,14 +92,14 @@ export default function SettingsPage() {
                   setSettings((state) => ({ ...state, language: event.target.value }))
                 }
               >
-                <option value="ru">Р СѓСЃСЃРєРёР№</option>
-                <option value="kk">Қазақша</option>
+                <option value="ru">Русский</option>
+                <option value="kk">Казахский</option>
                 <option value="en">English</option>
               </select>
             </div>
 
             <div className="setting-row">
-              <label className="setting-label">Р РµРіРёРѕРЅ</label>
+              <label className="setting-label">Регион</label>
               <input
                 className="setting-input"
                 value={settings.region}
@@ -118,31 +118,31 @@ export default function SettingsPage() {
                     setSettings((state) => ({ ...state, newsletter: event.target.checked }))
                   }
                 />
-                РџРѕРґРїРёСЃРєР° РЅР° СЂР°СЃСЃС‹Р»РєСѓ
+                Подписка на рассылку
               </label>
             </div>
 
             <button onClick={handleSave} className="btn btn-primary" disabled={saveStatus === "pending"}>
-              {saveStatus === "pending" ? "РЎРѕС…СЂР°РЅРµРЅРёРµ..." : "РЎРѕС…СЂР°РЅРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё"}
+              {saveStatus === "pending" ? "Сохранение..." : "Сохранить настройки"}
             </button>
           </div>
         </div>
 
         <div className="settings-section">
-          <h2>РџСЂРѕС‡РµРµ</h2>
+          <h2>Прочее</h2>
           <div className="settings-grid">
-            <Link to="/analytics" className="setting-tile">рџ“Љ РђРЅР°Р»РёС‚РёРєР°</Link>
-            <Link to="/subscription" className="setting-tile">рџ’° РџРѕРґРїРёСЃРєР°</Link>
-            <div className="setting-tile">рџ’і РџСЂРёРІСЏР·Р°РЅРЅР°СЏ РєР°СЂС‚Р°</div>
+            <Link to="/analytics" className="setting-tile">Аналитика</Link>
+            <Link to="/subscription" className="setting-tile">Подписка</Link>
+            <div className="setting-tile">Привязанная карта</div>
             <div className="setting-tile">FAQ</div>
           </div>
         </div>
 
         <div className="settings-section">
-          <h2>РЈРїСЂР°РІР»РµРЅРёРµ Р°РєРєР°СѓРЅС‚РѕРј</h2>
+          <h2>Управление аккаунтом</h2>
           <div className="settings-grid">
             <button className="btn btn-danger" onClick={handleLogout}>
-              Р’С‹Р№С‚Рё
+              Выйти
             </button>
           </div>
         </div>

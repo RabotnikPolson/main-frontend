@@ -11,7 +11,7 @@ export default function SubscriptionPage() {
   if (!username) {
     return (
       <div className="container subscription-page">
-        <p>Р’РѕР№РґРёС‚Рµ РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ РїРѕРґРїРёСЃРєРѕР№</p>
+        <p>Войдите для управления подпиской</p>
       </div>
     );
   }
@@ -19,7 +19,7 @@ export default function SubscriptionPage() {
   if (isLoading) {
     return (
       <div className="container subscription-page">
-        <p>Р—Р°РіСЂСѓР·РєР°...</p>
+        <p>Загрузка...</p>
       </div>
     );
   }
@@ -38,22 +38,22 @@ export default function SubscriptionPage() {
 
   return (
     <div className="container subscription-page">
-      <h1>РџРѕРґРїРёСЃРєР°</h1>
+      <h1>Подписка</h1>
       <div className="sub-card">
         <div>
-          РўРµРєСѓС‰РёР№ РїР»Р°РЅ: <strong>{sub?.plan || "free"}</strong>
+          Текущий план: <strong>{sub?.plan || "free"}</strong>
         </div>
         <div>
-          РЎС‚Р°С‚СѓСЃ: <strong>{sub?.status || "none"}</strong>
+          Статус: <strong>{sub?.status || "none"}</strong>
         </div>
 
         {sub?.status === "active" ? (
           <button onClick={onCancel} className="button button--ghost">
-            РћС‚РјРµРЅРёС‚СЊ РїРѕРґРїРёСЃРєСѓ
+            Отменить подписку
           </button>
         ) : (
           <button onClick={onSubscribe} className="button">
-            РћС„РѕСЂРјРёС‚СЊ PRO
+            Оформить PRO
           </button>
         )}
       </div>

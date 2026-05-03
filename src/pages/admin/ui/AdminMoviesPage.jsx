@@ -13,13 +13,13 @@ export default function AdminMoviesPage() {
     mutationFn: (id) => addFromKinopoisk(id),
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["movies"] });
-      setMsg(`Р¤РёР»СЊРј "${data?.title || `ID: ${kpId}`}" СѓСЃРїРµС€РЅРѕ РґРѕР±Р°РІР»РµРЅ`);
+      setMsg(`Фильм "${data?.title || `ID: ${kpId}`}" успешно добавлен`);
       setKpId("");
     },
     onError: (err) => {
       const errorMsg =
-        err.response?.data?.message || err.message || "РћС€РёР±РєР° СЃРµСЂРІРµСЂР°";
-      setMsg(`РћС€РёР±РєР°: ${errorMsg}`);
+        err.response?.data?.message || err.message || "Ошибка сервера";
+      setMsg(`Ошибка: ${errorMsg}`);
     },
   });
 
@@ -27,14 +27,14 @@ export default function AdminMoviesPage() {
     mutationFn: (id) => deleteMovie(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["movies"] });
-      setMsg("Р¤РёР»СЊРј СѓРґР°Р»РµРЅ.");
+      setMsg("Фильм удален.");
     },
     onError: (err) => {
       const status = err.response?.status;
       const backend =
-        err.response?.data?.message || err.response?.data || "РћС€РёР±РєР° СЃРµСЂРІРµСЂР°";
+        err.response?.data?.message || err.response?.data || "Ошибка сервера";
       const errorMsg = `${status ? `[${status}] ` : ""}${backend}`;
-      setMsg(`РћС€РёР±РєР° СѓРґР°Р»РµРЅРёСЏ: ${errorMsg}`);
+      setMsg(`Ошибка удаления: ${errorMsg}`);
     },
   });
 
@@ -43,7 +43,7 @@ export default function AdminMoviesPage() {
     const id = kpId.trim();
 
     if (!/^[0-9]+$/.test(id)) {
-      setMsg("Р’РІРµРґРёС‚Рµ С‡РёСЃР»РѕРІРѕР№ Kinopoisk ID");
+      setMsg("Введите числовой Kinopoisk ID");
       return;
     }
 
@@ -51,28 +51,28 @@ export default function AdminMoviesPage() {
   };
 
   if (isLoading) {
-    return <div className="container"><p>Р—Р°РіСЂСѓР·РєР° СЃРїРёСЃРєР° С„РёР»СЊРјРѕРІ...</p></div>;
+    return <div className="container"><p>Загрузка списка фильмов...</p></div>;
   }
 
   if (isError) {
-    return <div className="container"><p>РћС€РёР±РєР°: {error?.message || "РќРµ СѓРґР°Р»РѕСЃСЊ РїРѕР»СѓС‡РёС‚СЊ С„РёР»СЊРјС‹"}</p></div>;
+    return <div className="container"><p>Ошибка: {error?.message || "Не удалось получить фильмы"}</p></div>;
   }
 
   return (
     <div className="container addmovie-page">
-      <h1>РђРґРјРёРЅ: СѓРїСЂР°РІР»РµРЅРёРµ С„РёР»СЊРјР°РјРё</h1>
+      <h1>Админ: управление фильмами</h1>
 
       <section className="admin-add-section">
-        <h2>Р”РѕР±Р°РІРёС‚СЊ С„РёР»СЊРј РїРѕ Kinopoisk ID</h2>
+        <h2>Добавить фильм по Kinopoisk ID</h2>
         <form onSubmit={onSubmit} className="imdb-import">
           <input
             className="input"
             value={kpId}
             onChange={(event) => setKpId(event.target.value)}
-            placeholder="РџСЂРёРјРµСЂ: 301"
+            placeholder="Пример: 301"
           />
           <button className="button" disabled={addMut.isPending}>
-            {addMut.isPending ? "РРјРїРѕСЂС‚..." : "РРјРїРѕСЂС‚РёСЂРѕРІР°С‚СЊ"}
+            {addMut.isPending ? "Импорт..." : "Импортировать"}
           </button>
         </form>
       </section>
@@ -84,19 +84,19 @@ export default function AdminMoviesPage() {
       )}
 
       <section className="admin-list-section">
-        <h2>РЎРїРёСЃРѕРє С„РёР»СЊРјРѕРІ</h2>
+        <h2>Список фильмов</h2>
         {movies.length === 0 ? (
-          <p>Р¤РёР»СЊРјС‹ РЅРµ РЅР°Р№РґРµРЅС‹.</p>
+          <p>Фильмы не найдены.</p>
         ) : (
           <div className="movie-table-wrap">
             <table className="admin-movie-table">
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>РќР°Р·РІР°РЅРёРµ</th>
-                  <th>Р“РѕРґ</th>
-                  <th>Р–Р°РЅСЂ</th>
-                  <th>Р”РµР№СЃС‚РІРёСЏ</th>
+                  <th>Название</th>
+                  <th>Год</th>
+                  <th>Жанр</th>
+                  <th>Действия</th>
                 </tr>
               </thead>
               <tbody>
@@ -104,20 +104,20 @@ export default function AdminMoviesPage() {
                   <tr key={movie.id}>
                     <td>{movie.id}</td>
                     <td>{movie.title}</td>
-                    <td>{movie.year || "—"}</td>
-                    <td>{movie.genre || "—"}</td>
+                    <td>{movie.year || "-"}</td>
+                    <td>{movie.genre || "-"}</td>
                     <td>
                       <button
                         className="button button--ghost"
                         disabled={deleteMut.isPending}
                         onClick={() => {
-                          if (!window.confirm(`РЈРґР°Р»РёС‚СЊ С„РёР»СЊРј "${movie.title}" (ID ${movie.id})?`)) {
+                          if (!window.confirm(`Удалить фильм "${movie.title}" (ID ${movie.id})?`)) {
                             return;
                           }
                           deleteMut.mutate(movie.id);
                         }}
                       >
-                        РЈРґР°Р»РёС‚СЊ
+                        Удалить
                       </button>
                     </td>
                   </tr>

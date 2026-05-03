@@ -16,7 +16,7 @@ export default function GenresPage() {
 
   return (
     <div className="container genres-page">
-      <h1>Р–Р°РЅСЂС‹</h1>
+      <h1>Жанры</h1>
 
       <div className="genres-row">
         {genres.map((genre) => (

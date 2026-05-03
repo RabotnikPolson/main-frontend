@@ -34,21 +34,21 @@ export default function UserActivityPage() {
   const openReview = (review) => setEditingReview(review);
 
   if (isLoading) {
-    return <p className="profile-muted">Р—Р°РіСЂСѓР·РєР°...</p>;
+    return <p className="profile-muted">Загрузка...</p>;
   }
 
   if (isError) {
-    return <p className="profile-muted">РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ Р°РєС‚РёРІРЅРѕСЃС‚СЊ.</p>;
+    return <p className="profile-muted">Не удалось загрузить активность.</p>;
   }
 
   if (!data || data.length === 0) {
-    return <p className="profile-muted">РќРµС‚ Р°РєС‚РёРІРЅРѕСЃС‚Рё.</p>;
+    return <p className="profile-muted">Нет активности.</p>;
   }
 
   return (
     <div className="container profile-page">
       <div className="profile-shell">
-        <h1 className="profile-title">РђРєС‚РёРІРЅРѕСЃС‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ {username}</h1>
+        <h1 className="profile-title">Активность пользователя {username}</h1>
 
         <div className="profile-card">
           {data.map((item, index) => {
@@ -60,7 +60,7 @@ export default function UserActivityPage() {
                   onReadFull={openReview}
                   isOwner
                   onEdit={() => setEditingReview(item)}
-                  onDelete={() => alert(`РЈРґР°Р»РёС‚СЊ РѕС‚Р·С‹РІ ${item.id}`)}
+                  onDelete={() => alert(`Удалить отзыв ${item.id}`)}
                 />
               );
             }
@@ -71,9 +71,9 @@ export default function UserActivityPage() {
                   key={`comment-${item.id || index}`}
                   node={item}
                   isReply={false}
-                  onReply={(text) => alert(`РћС‚РІРµС‚ ${item.id}: ${text}`)}
-                  onDelete={() => alert(`РЈРґР°Р»РёС‚СЊ РєРѕРјРјРµРЅС‚Р°СЂРёР№ ${item.id}`)}
-                  onReact={(emoji) => alert(`Р РµР°РєС†РёСЏ ${emoji} РЅР° ${item.id}`)}
+                  onReply={(text) => alert(`Ответ ${item.id}: ${text}`)}
+                  onDelete={() => alert(`Удалить комментарий ${item.id}`)}
+                  onReact={(emoji) => alert(`Реакция ${emoji} на ${item.id}`)}
                 />
               );
             }

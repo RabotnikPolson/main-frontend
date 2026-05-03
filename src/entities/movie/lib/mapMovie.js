@@ -2,7 +2,7 @@ export function mapMovie(dto = {}) {
   const id = dto.id ?? null;
 
   const imdbId = dto.imdbId || dto.imdbID || null;
-  const title = dto.title || dto.Title || "Р‘РµР· РЅР°Р·РІР°РЅРёСЏ";
+  const title = dto.title || dto.Title || "Без названия";
   const poster = dto.posterUrl || dto.Poster || null;
   const genre = (dto.genre && dto.genre.name) || dto.genreText || dto.Genre || "";
   const yearRaw = dto.year || dto.Year;

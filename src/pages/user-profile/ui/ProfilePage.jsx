@@ -39,21 +39,21 @@ function isProbablyUrl(value) {
 function formatSeconds(total) {
   const seconds = Number(total || 0);
   if (!isFinite(seconds) || seconds <= 0) {
-    return "0 РјРёРЅ";
+    return "0 мин";
   }
 
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
 
   if (hours <= 0) {
-    return `${minutes} РјРёРЅ`;
+    return `${minutes} мин`;
   }
 
   if (minutes <= 0) {
-    return `${hours} С‡`;
+    return `${hours} ч`;
   }
 
-  return `${hours} С‡ ${minutes} РјРёРЅ`;
+  return `${hours} ч ${minutes} мин`;
 }
 
 export default function ProfilePage() {
@@ -108,7 +108,7 @@ export default function ProfilePage() {
   }, [profile]);
 
   const displayName = useMemo(
-    () => profile?.nickname || profile?.username || profile?.email || username || "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ",
+    () => profile?.nickname || profile?.username || profile?.email || username || "Пользователь",
     [profile, username]
   );
   const email = useMemo(() => profile?.email || user?.email || "", [profile, user]);
@@ -141,7 +141,7 @@ export default function ProfilePage() {
   const applyAvatarDraft = () => {
     const nextValue = (avatarDraft || "").trim();
     if (!isProbablyUrl(nextValue)) {
-      setAvatarDraftError("РЎСЃС‹Р»РєР° РґРѕР»Р¶РЅР° РЅР°С‡РёРЅР°С‚СЊСЃСЏ СЃ http:// РёР»Рё https://");
+      setAvatarDraftError("Ссылка должна начинаться с http:// или https://");
       return;
     }
 
@@ -166,14 +166,14 @@ export default function ProfilePage() {
         bio: payload.bio || "",
         isPrivate: payload.isPrivate,
       });
-      setToast({ type: "ok", text: "РЎРѕС…СЂР°РЅРµРЅРѕ" });
+      setToast({ type: "ok", text: "Сохранено" });
       setTimeout(() => setToast(null), 1800);
     } catch (saveProfileError) {
       const msg =
         saveProfileError?.response?.data?.message ||
         saveProfileError?.response?.data ||
         saveProfileError?.message ||
-        "РћС€РёР±РєР° СЃРѕС…СЂР°РЅРµРЅРёСЏ";
+        "Ошибка сохранения";
       setToast({ type: "err", text: String(msg) });
       setTimeout(() => setToast(null), 3500);
     }
@@ -183,9 +183,9 @@ export default function ProfilePage() {
     return (
       <div className="container profile-page">
         <div className="profile-shell">
-          <h1 className="profile-title">РџСЂРѕС„РёР»СЊ</h1>
+          <h1 className="profile-title">Профиль</h1>
           <div className="profile-card">
-            <p className="profile-muted">Р’РѕР№РґРёС‚Рµ, С‡С‚РѕР±С‹ СѓРїСЂР°РІР»СЏС‚СЊ РїСЂРѕС„РёР»РµРј.</p>
+            <p className="profile-muted">Войдите, чтобы управлять профилем.</p>
           </div>
         </div>
       </div>
@@ -196,9 +196,9 @@ export default function ProfilePage() {
     return (
       <div className="container profile-page">
         <div className="profile-shell">
-          <h1 className="profile-title">РџСЂРѕС„РёР»СЊ</h1>
+          <h1 className="profile-title">Профиль</h1>
           <div className="profile-card">
-            <p className="profile-muted">Р—Р°РіСЂСѓР·РєР°...</p>
+            <p className="profile-muted">Загрузка...</p>
           </div>
         </div>
       </div>
@@ -210,14 +210,14 @@ export default function ProfilePage() {
       error?.response?.data?.message ||
       error?.response?.data ||
       error?.message ||
-      "РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё";
+      "Ошибка загрузки";
 
     return (
       <div className="container profile-page">
         <div className="profile-shell">
-          <h1 className="profile-title">РџСЂРѕС„РёР»СЊ</h1>
+          <h1 className="profile-title">Профиль</h1>
           <div className="profile-card">
-            <p className="profile-error">РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ РїСЂРѕС„РёР»СЊ: {String(msg)}</p>
+            <p className="profile-error">Не удалось загрузить профиль: {String(msg)}</p>
           </div>
         </div>
       </div>
@@ -228,7 +228,7 @@ export default function ProfilePage() {
     <div className="container profile-page">
       <div className="profile-shell">
         <div className="profile-header">
-          <h1 className="profile-title">РџСЂРѕС„РёР»СЊ</h1>
+          <h1 className="profile-title">Профиль</h1>
 
           <div className="profile-header-actions">
             {toast ? (
@@ -241,9 +241,9 @@ export default function ProfilePage() {
               className="profile-btn primary"
               onClick={onSave}
               disabled={!hasChanges || saveStatus === "pending"}
-              title={!hasChanges ? "РќРµС‚ РёР·РјРµРЅРµРЅРёР№" : "РЎРѕС…СЂР°РЅРёС‚СЊ"}
+              title={!hasChanges ? "Нет изменений" : "Сохранить"}
             >
-              {saveStatus === "pending" ? "РЎРѕС…СЂР°РЅРµРЅРёРµ..." : "РЎРѕС…СЂР°РЅРёС‚СЊ"}
+              {saveStatus === "pending" ? "Сохранение..." : "Сохранить"}
             </button>
           </div>
         </div>
@@ -253,9 +253,9 @@ export default function ProfilePage() {
             <div className="profile-main">
               <div className="profile-avatar">
                 {avatarSrc && !avatarBroken ? (
-                  <img src={avatarSrc} alt="Avatar" onError={() => setAvatarBroken(true)} />
+                  <img src={avatarSrc} alt="Аватар" onError={() => setAvatarBroken(true)} />
                 ) : (
-                  <div className="profile-avatar-fallback" aria-label="Avatar fallback">
+                  <div className="profile-avatar-fallback" aria-label="Аватар по умолчанию">
                     {initials}
                   </div>
                 )}
@@ -267,25 +267,25 @@ export default function ProfilePage() {
 
                 <div className="profile-main-actions">
                   <button className="profile-btn" onClick={openAvatarModal}>
-                    РР·РјРµРЅРёС‚СЊ С„РѕС‚Рѕ
+                    Изменить фото
                   </button>
 
                   {hasChanges ? (
-                    <span className="profile-badge">Р•СЃС‚СЊ РЅРµСЃРѕС…СЂР°РЅРµРЅРЅС‹Рµ РёР·РјРµРЅРµРЅРёСЏ</span>
+                    <span className="profile-badge">Есть несохраненные изменения</span>
                   ) : (
-                    <span className="profile-badge subtle">Р’СЃС‘ СЃРѕС…СЂР°РЅРµРЅРѕ</span>
+                    <span className="profile-badge subtle">Все сохранено</span>
                   )}
                 </div>
               </div>
             </div>
 
             <div className="profile-section">
-              <div className="profile-section-title">Рћ СЃРµР±Рµ</div>
+              <div className="profile-section-title">О себе</div>
               <textarea
                 className="profile-textarea"
                 value={form.bio}
                 onChange={(event) => setForm((state) => ({ ...state, bio: event.target.value }))}
-                placeholder="РќР°РїРёС€РёС‚Рµ РїР°СЂСѓ СЃР»РѕРІ..."
+                placeholder="Напишите пару слов..."
                 maxLength={350}
                 rows={4}
               />
@@ -293,7 +293,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="profile-section">
-              <div className="profile-section-title">РџСЂРёРІР°С‚РЅРѕСЃС‚СЊ</div>
+              <div className="profile-section-title">Приватность</div>
 
               <label className="profile-toggle">
                 <input
@@ -304,11 +304,11 @@ export default function ProfilePage() {
                   }
                 />
                 <span className="profile-toggle-ui" />
-                <span className="profile-toggle-text">РџСЂРёРІР°С‚РЅС‹Р№ РїСЂРѕС„РёР»СЊ</span>
+                <span className="profile-toggle-text">Приватный профиль</span>
               </label>
 
               <div className="profile-hint">
-                Р•СЃР»Рё РІРєР»СЋС‡РµРЅРѕ, РґСЂСѓРіРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё РЅРµ СѓРІРёРґСЏС‚ РІР°С€Сѓ Р°РєС‚РёРІРЅРѕСЃС‚СЊ.
+                Если включено, другие пользователи не увидят вашу активность.
               </div>
             </div>
 
@@ -318,7 +318,7 @@ export default function ProfilePage() {
                   saveError?.response?.data?.message ||
                     saveError?.response?.data ||
                     saveError?.message ||
-                    "РћС€РёР±РєР° СЃРѕС…СЂР°РЅРµРЅРёСЏ"
+                    "Ошибка сохранения"
                 )}
               </div>
             ) : null}
@@ -326,30 +326,30 @@ export default function ProfilePage() {
 
           <div className="profile-side">
             <div className="profile-card">
-              <div className="profile-section-title">РђРєС‚РёРІРЅРѕСЃС‚СЊ</div>
+              <div className="profile-section-title">Активность</div>
               <button className="profile-btn" onClick={() => (window.location.href = `/activity/${username}`)}>
-                РџРѕСЃРјРѕС‚СЂРµС‚СЊ РЅРµРґР°РІРЅРёРµ Р°РєС‚РёРІРЅРѕСЃС‚Рё
+                Посмотреть недавнюю активность
               </button>
             </div>
 
             <div className="profile-card">
-              <div className="profile-section-title">РњРѕСЏ Р°РєС‚РёРІРЅРѕСЃС‚СЊ</div>
+              <div className="profile-section-title">Моя активность</div>
 
               {analytics.isLoading ? (
-                <p className="profile-muted">Р—Р°РіСЂСѓР·РєР°...</p>
+                <p className="profile-muted">Загрузка...</p>
               ) : analytics.isError ? (
-                <p className="profile-muted">РџРѕРєР° РЅРµС‚ РґР°РЅРЅС‹С….</p>
+                <p className="profile-muted">Пока нет данных.</p>
               ) : (
                 <div className="profile-stats">
                   <div className="profile-stat">
-                    <div className="profile-stat-label">Р’СЂРµРјСЏ РїСЂРѕСЃРјРѕС‚СЂР°</div>
+                    <div className="profile-stat-label">Время просмотра</div>
                     <div className="profile-stat-value">
                       {formatSeconds(analytics.data?.totalSeconds)}
                     </div>
                   </div>
 
                   <div className="profile-stat">
-                    <div className="profile-stat-label">РўРѕРї Р¶Р°РЅСЂС‹</div>
+                    <div className="profile-stat-label">Топ жанры</div>
                     <div className="profile-chips">
                       {(analytics.data?.topGenres || []).slice(0, 6).map((genre) => (
                         <span key={genre.genre} className="profile-chip">
@@ -357,7 +357,7 @@ export default function ProfilePage() {
                         </span>
                       ))}
                       {(!analytics.data?.topGenres || analytics.data.topGenres.length === 0) && (
-                        <span className="profile-muted">РќРµС‚ Р¶Р°РЅСЂРѕРІ</span>
+                        <span className="profile-muted">Нет жанров</span>
                       )}
                     </div>
                   </div>
@@ -366,12 +366,12 @@ export default function ProfilePage() {
             </div>
 
             <div className="profile-card">
-              <div className="profile-section-title">Р¤РѕС‚Рѕ РїСЂРѕС„РёР»СЏ</div>
+              <div className="profile-section-title">Фото профиля</div>
               <p className="profile-muted">
-                РЎРµР№С‡Р°СЃ С„РѕС‚Рѕ С…СЂР°РЅРёС‚СЃСЏ РєР°Рє СЃСЃС‹Р»РєР°. Р•СЃР»Рё РЅСѓР¶РЅР° Р·Р°РіСЂСѓР·РєР° С„Р°Р№Р»РѕРІ, СЌС‚Рѕ С‚СЂРµР±СѓРµС‚ РѕС‚РґРµР»СЊРЅРѕР№ Р·Р°РґР°С‡Рё РЅР° Р±СЌРєРµРЅРґРµ.
+                Сейчас фото хранится как ссылка. Если нужна загрузка файлов, это требует отдельной задачи на бэкенде.
               </p>
               <button className="profile-btn" onClick={openAvatarModal}>
-                РџРѕРјРµРЅСЏС‚СЊ С„РѕС‚Рѕ
+                Поменять фото
               </button>
             </div>
           </div>
@@ -381,8 +381,8 @@ export default function ProfilePage() {
           <div className="profile-modal-backdrop" onMouseDown={closeAvatarModal}>
             <div className="profile-modal" onMouseDown={(event) => event.stopPropagation()}>
               <div className="profile-modal-head">
-                <div className="profile-modal-title">РР·РјРµРЅРёС‚СЊ С„РѕС‚Рѕ</div>
-                <button className="profile-btn icon" onClick={closeAvatarModal} aria-label="Close">
+                <div className="profile-modal-title">Изменить фото</div>
+                <button className="profile-btn icon" onClick={closeAvatarModal} aria-label="Закрыть">
                   x
                 </button>
               </div>
@@ -390,7 +390,7 @@ export default function ProfilePage() {
               <div className="profile-modal-body">
                 <div className="profile-modal-preview">
                   {avatarDraft && isProbablyUrl(avatarDraft) ? (
-                    <img src={avatarDraft} alt="Preview" />
+                    <img src={avatarDraft} alt="Предпросмотр" />
                   ) : (
                     <div className="profile-modal-preview-fallback">{initials}</div>
                   )}
@@ -398,7 +398,7 @@ export default function ProfilePage() {
 
                 <div className="profile-modal-fields">
                   <label className="profile-label">
-                    РЎСЃС‹Р»РєР° РЅР° РёР·РѕР±СЂР°Р¶РµРЅРёРµ
+                    Ссылка на изображение
                     <input
                       className="profile-input"
                       value={avatarDraft}
@@ -415,17 +415,17 @@ export default function ProfilePage() {
                   ) : null}
 
                   <div className="profile-hint">
-                    РџРѕРґРґРµСЂР¶РёРІР°СЋС‚СЃСЏ РѕР±С‹С‡РЅС‹Рµ http/https СЃСЃС‹Р»РєРё.
+                    Поддерживаются обычные http/https ссылки.
                   </div>
                 </div>
               </div>
 
               <div className="profile-modal-actions">
                 <button className="profile-btn" onClick={closeAvatarModal}>
-                  РћС‚РјРµРЅР°
+                  Отмена
                 </button>
                 <button className="profile-btn primary" onClick={applyAvatarDraft}>
-                  РџСЂРёРјРµРЅРёС‚СЊ
+                  Применить
                 </button>
               </div>
             </div>

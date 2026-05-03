@@ -52,9 +52,9 @@ export default function RatingStars({
     return { full, half };
   }, [value]);
 
-  const handle = (i, half) => {
+  const handle = (i, halfStar) => {
     if (!onChange) return;
-    const newValue = i + (half ? 0.5 : 1);
+    const newValue = i + (halfStar ? 0.5 : 1);
     onChange(newValue);
   };
 

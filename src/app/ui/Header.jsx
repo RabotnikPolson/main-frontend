@@ -178,7 +178,7 @@ export default function Header() {
               ref={inputRef}
               type="text"
               className="search-input"
-              placeholder="Р’РІРµРґРёС‚Рµ Р·Р°РїСЂРѕСЃ"
+              placeholder="Введите запрос"
               value={q}
               onChange={(event) => {
                 setQ(event.target.value);
@@ -188,12 +188,17 @@ export default function Header() {
               onKeyDown={onKeyDown}
             />
             {q && (
-              <button type="button" className="search-btn search-clear" aria-label="Clear" onClick={clearQuery}>
+              <button
+                type="button"
+                className="search-btn search-clear"
+                aria-label="Очистить запрос"
+                onClick={clearQuery}
+              >
                 x
               </button>
             )}
-            <button type="submit" className="search-btn" aria-label="Search">
-              Search
+            <button type="submit" className="search-btn" aria-label="Поиск">
+              Поиск
             </button>
           </form>
 
@@ -224,7 +229,7 @@ export default function Header() {
               </ul>
               <div className="search-footer">
                 <button className="clear-history" type="button" onClick={clearHistory}>
-                  РћС‡РёСЃС‚РёС‚СЊ РёСЃС‚РѕСЂРёСЋ
+                  Очистить историю
                 </button>
               </div>
             </div>
@@ -236,23 +241,23 @@ export default function Header() {
             <>
               {user?.profile && user?.profile?.roles && String(user.profile.roles).toLowerCase().includes("admin") ? (
                 <Link to="/admin/movies" className="auth-link">
-                  РђРґРјРёРЅРєР°
+                  Админка
                 </Link>
               ) : null}
               <Link to="/profile" className="profile-link">
                 @{user.username}
               </Link>
               <button type="button" className="logout-btn" onClick={logout}>
-                Р’С‹Р№С‚Рё
+                Выйти
               </button>
             </>
           ) : (
             <>
               <Link to="/login" className="auth-link">
-                Р’РѕР№С‚Рё
+                Войти
               </Link>
               <Link to="/register" className="auth-link">
-                Р РµРіРёСЃС‚СЂР°С†РёСЏ
+                Регистрация
               </Link>
             </>
           )}

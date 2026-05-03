@@ -33,10 +33,10 @@ export default function RegisterPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Р РµРіРёСЃС‚СЂР°С†РёСЏ</h1>
+        <h1>Регистрация</h1>
 
         {mutation.isError && (
-          <p className="error">РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ Р°РєРєР°СѓРЅС‚.</p>
+          <p className="error">Не удалось создать аккаунт.</p>
         )}
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -54,7 +54,7 @@ export default function RegisterPage() {
             className="input"
             type="text"
             name="username"
-            placeholder="Р›РѕРіРёРЅ"
+            placeholder="Логин"
             value={form.username}
             onChange={handleChange}
             autoComplete="username"
@@ -66,7 +66,7 @@ export default function RegisterPage() {
             className="input"
             type="password"
             name="password"
-            placeholder="РџР°СЂРѕР»СЊ"
+            placeholder="Пароль"
             value={form.password}
             onChange={handleChange}
             autoComplete="new-password"
@@ -74,7 +74,7 @@ export default function RegisterPage() {
             required
           />
           <button className="button" type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? "РЎРѕР·РґР°РµРј..." : "РЎРћР—Р”РђРўР¬ РђРљРљРђРЈРќРў"}
+            {mutation.isPending ? "Создаём..." : "Создать аккаунт"}
           </button>
         </form>
       </div>

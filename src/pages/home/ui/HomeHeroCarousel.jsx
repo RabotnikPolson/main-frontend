@@ -34,16 +34,16 @@ export default function HomeHeroCarousel() {
 
     if (feed.continue_watching?.length > 0) {
       nextSections.push({
-        title: "РџСЂРѕРґРѕР»Р¶РёС‚СЊ РїСЂРѕСЃРјРѕС‚СЂ",
-        subtitle: "Р’С‹ РѕСЃС‚Р°РЅРѕРІРёР»РёСЃСЊ Р·РґРµСЃСЊ",
+        title: "Продолжить просмотр",
+        subtitle: "Вы остановились здесь",
         items: enrichMovies(feed.continue_watching),
       });
     }
 
     if (feed.top_picks_for_you?.length > 0) {
       nextSections.push({
-        title: "РЎРїРµС†РёР°Р»СЊРЅРѕ РґР»СЏ РІР°СЃ",
-        subtitle: "AI РїРѕРґР±РѕСЂРєР°",
+        title: "Специально для вас",
+        subtitle: "AI подборка",
         items: enrichMovies(feed.top_picks_for_you),
       });
     }
@@ -51,15 +51,15 @@ export default function HomeHeroCarousel() {
     if (feed.because_you_watched?.recommendations?.length > 0) {
       nextSections.push({
         title: feed.because_you_watched.reason,
-        subtitle: "РџРѕС…РѕР¶РёР№ РєРѕРЅС‚РµРЅС‚",
+        subtitle: "Похожий контент",
         items: enrichMovies(feed.because_you_watched.recommendations),
       });
     }
 
     if (feed.trending?.length > 0) {
       nextSections.push({
-        title: "Р’ С‚СЂРµРЅРґРµ",
-        subtitle: "РџРѕРїСѓР»СЏСЂРЅС‹Рµ С„РёР»СЊРјС‹",
+        title: "В тренде",
+        subtitle: "Популярные фильмы",
         items: enrichMovies(feed.trending),
       });
     }
@@ -68,13 +68,13 @@ export default function HomeHeroCarousel() {
   }, [feed, allMovies]);
 
   if (isLoading) {
-    return <div style={{ color: "#fff", padding: "20px" }}>Р—Р°РіСЂСѓР·РєР°...</div>;
+    return <div style={{ color: "#fff", padding: "20px" }}>Загрузка...</div>;
   }
 
   if (!sections.length) {
     return (
       <div style={{ color: "gray", padding: "20px" }}>
-        Р”РѕР±Р°РІСЊС‚Рµ Р±РѕР»СЊС€Рµ С„РёР»СЊРјРѕРІ РІ Р±Р°Р·Сѓ, С‡С‚РѕР±С‹ РЅРµР№СЂРѕСЃРµС‚СЊ РѕР¶РёР»Р°.
+        Добавьте больше фильмов в базу, чтобы рекомендации ожили.
       </div>
     );
   }
@@ -113,9 +113,9 @@ export default function HomeHeroCarousel() {
                   <div className="carousel-overlay">
                     <h3>{movie.title}</h3>
                     <span>
-                      {movie.year} ? {movie.imdbRating || "0"}
+                      {movie.year} · {movie.imdbRating || "0"}
                     </span>
-                    <button className="watch-btn">РЎРјРѕС‚СЂРµС‚СЊ</button>
+                    <button className="watch-btn">Смотреть</button>
                   </div>
                 </div>
               </SwiperSlide>

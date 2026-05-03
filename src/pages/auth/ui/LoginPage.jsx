@@ -35,11 +35,11 @@ export default function LoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Р’С…РѕРґ</h1>
+        <h1>Вход</h1>
 
         {mutation.isError && (
           <div className="error">
-            РќРµ СѓРґР°Р»РѕСЃСЊ РІРѕР№С‚Рё. РџСЂРѕРІРµСЂСЊС‚Рµ email Рё РїР°СЂРѕР»СЊ.
+            Не удалось войти. Проверьте email и пароль.
           </div>
         )}
 
@@ -58,22 +58,22 @@ export default function LoginPage() {
             className="input"
             type="password"
             name="password"
-            placeholder="РџР°СЂРѕР»СЊ"
+            placeholder="Пароль"
             value={form.password}
             onChange={handleChange}
             autoComplete="current-password"
             required
           />
           <button className="button" type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? "Р’С…РѕРґРёРј..." : "Р’РѕР№С‚Рё"}
+            {mutation.isPending ? "Входим..." : "Войти"}
           </button>
         </form>
 
         <div className="auth-switch">
           <small>
-            РќРµС‚ Р°РєРєР°СѓРЅС‚Р°?{" "}
+            Нет аккаунта?{" "}
             <Link to="/register" state={{ from }}>
-              Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊСЃСЏ
+              Зарегистрироваться
             </Link>
           </small>
         </div>

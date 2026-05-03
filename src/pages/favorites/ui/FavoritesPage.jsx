@@ -86,12 +86,12 @@ export default function FavoritesPage() {
 
   return (
     <div className="container favorites-page">
-      <h1>РР·Р±СЂР°РЅРЅРѕРµ</h1>
+      <h1>Избранное</h1>
 
-      {username && favsLoading && <div className="loading">Р—Р°РіСЂСѓР·РєР°...</div>}
+      {username && favsLoading && <div className="loading">Загрузка...</div>}
 
       {favMovies.length === 0 ? (
-        <div className="empty">РџСѓСЃС‚Рѕ</div>
+        <div className="empty">Пусто</div>
       ) : (
         <MovieGrid movies={favMovies} onToggleFavorite={toggle} />
       )}

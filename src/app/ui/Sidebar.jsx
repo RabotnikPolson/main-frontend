@@ -5,19 +5,19 @@ import { useAuth } from "@/features/auth";
 export default function Sidebar() {
   const { isAdmin } = useAuth();
   const items = [
-    { to: "/", label: "Р“Р»Р°РІРЅР°СЏ" },
-    { to: "/genres", label: "Р–Р°РЅСЂС‹" },
-    { to: "/favorites", label: "РР·Р±СЂР°РЅРЅРѕРµ" },
-    { to: "/history", label: "РСЃС‚РѕСЂРёСЏ" },
-    { to: "/profile", label: "РџСЂРѕС„РёР»СЊ" },
-    { to: "/settings", label: "РќР°СЃС‚СЂРѕР№РєРё" },
-    { to: "/subscription", label: "РџРѕРґРїРёСЃРєР°" },
+    { to: "/", label: "Главная" },
+    { to: "/genres", label: "Жанры" },
+    { to: "/favorites", label: "Избранное" },
+    { to: "/history", label: "История" },
+    { to: "/profile", label: "Профиль" },
+    { to: "/settings", label: "Настройки" },
+    { to: "/subscription", label: "Подписка" },
   ];
 
   if (isAdmin) {
-    items.push({ to: "/admin/movies", label: "РђРґРјРёРЅ-РїР°РЅРµР»СЊ" });
-    items.push({ to: "/add-movie", label: "Р”РѕР±Р°РІРёС‚СЊ С„РёР»СЊРј" });
-    items.push({ to: "/analytics", label: "РђРЅР°Р»РёС‚РёРєР°" });
+    items.push({ to: "/admin/movies", label: "Админ-панель" });
+    items.push({ to: "/add-movie", label: "Добавить фильм" });
+    items.push({ to: "/analytics", label: "Аналитика" });
   }
 
   return (

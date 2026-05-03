@@ -12,13 +12,13 @@ export default function AddMoviePage() {
     mutationFn: (id) => addFromKinopoisk(id),
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["movies"] });
-      setMsg(`Р¤РёР»СЊРј "${data?.title || `ID: ${kpId}`}" СѓСЃРїРµС€РЅРѕ РґРѕР±Р°РІР»РµРЅ`);
+      setMsg(`Фильм "${data?.title || `ID: ${kpId}`}" успешно добавлен`);
       setKpId("");
     },
     onError: (err) => {
       const errorMsg =
-        err.response?.data?.message || err.message || "РћС€РёР±РєР° СЃРµСЂРІРµСЂР°";
-      setMsg(`РћС€РёР±РєР°: ${errorMsg}`);
+        err.response?.data?.message || err.message || "Ошибка сервера";
+      setMsg(`Ошибка: ${errorMsg}`);
     },
   });
 
@@ -27,7 +27,7 @@ export default function AddMoviePage() {
     const id = kpId.trim();
 
     if (!/^\d+$/.test(id)) {
-      setMsg("Р’РІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ С‡РёСЃР»РѕРІРѕР№ ID");
+      setMsg("Введите корректный числовой ID");
       return;
     }
 
@@ -36,17 +36,17 @@ export default function AddMoviePage() {
 
   return (
     <div className="addmovie-page container">
-      <h1>Р”РѕР±Р°РІРёС‚СЊ С„РёР»СЊРј РїРѕ РљРёРЅРѕРїРѕРёСЃРє ID</h1>
+      <h1>Добавить фильм по ID Кинопоиска</h1>
 
       <form onSubmit={submit} className="imdb-import">
         <input
           className="input"
           value={kpId}
           onChange={(event) => setKpId(event.target.value)}
-          placeholder="РќР°РїСЂРёРјРµСЂ: 301"
+          placeholder="Например: 301"
         />
         <button className="button" disabled={mutation.isPending}>
-          {mutation.isPending ? "РРјРїРѕСЂС‚..." : "РРјРїРѕСЂС‚РёСЂРѕРІР°С‚СЊ"}
+          {mutation.isPending ? "Импорт..." : "Импортировать"}
         </button>
       </form>
 

@@ -29,9 +29,9 @@ export default function HomePage() {
     <div className="container home-page">
       <HomeHeroCarousel userId={userId} />
 
-      <h1>РРјРїРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Рµ С„РёР»СЊРјС‹</h1>
-      {isLoading && <div className="loading">Р—Р°РіСЂСѓР·РєР°...</div>}
-      {isError && <div className="error">РћС€РёР±РєР°: {error.message}</div>}
+      <h1>Импортированные фильмы</h1>
+      {isLoading && <div className="loading">Загрузка...</div>}
+      {isError && <div className="error">Ошибка: {error.message}</div>}
       {!isLoading && <MovieGrid movies={filtered} />}
     </div>
   );

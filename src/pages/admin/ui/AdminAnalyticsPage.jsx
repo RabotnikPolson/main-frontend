@@ -23,23 +23,23 @@ export default function AdminAnalyticsPage() {
   if (loading) {
     return (
       <div className="container analytics-page">
-        <p>Р—Р°РіСЂСѓР·РєР°...</p>
+        <p>Загрузка...</p>
       </div>
     );
   }
 
   return (
     <div className="container analytics-page">
-      <h1>РђРЅР°Р»РёС‚РёРєР° (daily)</h1>
+      <h1>Аналитика по дням</h1>
       <div className="table-wrap">
         <table className="analytics-table">
           <thead>
             <tr>
-              <th>userId</th>
-              <th>date</th>
-              <th>plays</th>
-              <th>likes</th>
-              <th>shares</th>
+              <th>Пользователь</th>
+              <th>Дата</th>
+              <th>Просмотры</th>
+              <th>Лайки</th>
+              <th>Поделились</th>
             </tr>
           </thead>
           <tbody>

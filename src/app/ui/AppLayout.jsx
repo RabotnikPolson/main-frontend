@@ -19,7 +19,7 @@ export default function AppLayout() {
         )}
 
         <main className="main">
-          <React.Suspense fallback={<div className="loading">Р—Р°РіСЂСѓР·РєР°...</div>}>
+          <React.Suspense fallback={<div className="loading">Загрузка...</div>}>
             <Outlet />
           </React.Suspense>
         </main>

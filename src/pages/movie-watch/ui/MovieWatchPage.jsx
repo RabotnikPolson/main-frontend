@@ -30,15 +30,15 @@ function MoviePlayer({ streamData, title, isLoading, isError, onRetry, movieId }
       <div className="watch-player-inner">
         <div className="watch-player-panel">
           <button className="watch-open-btn" onClick={onOpenPlayer} disabled={!streamData?.url || isLoading}>
-            РћС‚РєСЂС‹С‚СЊ РІ РЅРѕРІРѕР№ РІРєР»Р°РґРєРµ
+            Открыть в новой вкладке
           </button>
 
-          {isLoading && <p className="watch-player-status">Р—Р°РіСЂСѓР·РєР° РІРёРґРµРѕ...</p>}
+          {isLoading && <p className="watch-player-status">Загрузка видео...</p>}
           {isError && (
             <p className="watch-player-status watch-player-status-error">
-              РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ РІРёРґРµРѕ.{" "}
+              Не удалось загрузить видео.{" "}
               <button className="btn-ghost" onClick={onRetry}>
-                РџРѕРІС‚РѕСЂРёС‚СЊ
+                Повторить
               </button>
             </p>
           )}
@@ -46,7 +46,7 @@ function MoviePlayer({ streamData, title, isLoading, isError, onRetry, movieId }
           {!!streamData?.url && (
             <div className="watch-embed-controls" style={{ marginTop: "10px" }}>
               <button className="btn" onClick={() => setShowEmbed((value) => !value)}>
-                {showEmbed ? "РЎРєСЂС‹С‚СЊ РїР»РµРµСЂ" : "РЎРјРѕС‚СЂРµС‚СЊ РїСЂСЏРјРѕ Р·РґРµСЃСЊ"}
+                {showEmbed ? "Скрыть плеер" : "Смотреть прямо здесь"}
               </button>
             </div>
           )}
@@ -115,7 +115,7 @@ export default function MovieWatchPage() {
       setEditing(null);
     } catch (reviewError) {
       console.error(reviewError);
-      alert("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ РѕС‚Р·С‹РІ.");
+      alert("Не удалось отправить отзыв.");
     }
   };
 
@@ -124,7 +124,7 @@ export default function MovieWatchPage() {
       return;
     }
 
-    if (!window.confirm("РЈРґР°Р»РёС‚СЊ РѕС‚Р·С‹РІ?")) {
+    if (!window.confirm("Удалить отзыв?")) {
       return;
     }
 
@@ -132,20 +132,20 @@ export default function MovieWatchPage() {
       await mutations.deleteReview.mutateAsync(reviewId);
     } catch (reviewError) {
       console.error(reviewError);
-      alert("РќРµ СѓРґР°Р»РѕСЃСЊ СѓРґР°Р»РёС‚СЊ РѕС‚Р·С‹РІ.");
+      alert("Не удалось удалить отзыв.");
     }
   };
 
   if (isLoading) {
-    return <div className="loading container">Р—Р°РіСЂСѓР·РєР° С„РёР»СЊРјР°...</div>;
+    return <div className="loading container">Загрузка фильма...</div>;
   }
 
   if (isError) {
     return (
       <div className="container">
-        <div className="error">РћС€РёР±РєР°: {error?.message || "РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ С„РёР»СЊРј"}</div>
+        <div className="error">Ошибка: {error?.message || "Не удалось загрузить фильм"}</div>
         <button className="button button--ghost" onClick={() => navigate(-1)}>
-          РќР°Р·Р°Рґ
+          Назад
         </button>
       </div>
     );
@@ -154,15 +154,15 @@ export default function MovieWatchPage() {
   if (!movieId) {
     return (
       <div className="container">
-        <div className="error">Р¤РёР»СЊРј РЅРµ РЅР°Р№РґРµРЅ</div>
+        <div className="error">Фильм не найден</div>
         <Link to="/" className="button button--ghost">
-          РќР° РіР»Р°РІРЅСѓСЋ
+          На главную
         </Link>
       </div>
     );
   }
 
-  const title = movie?.title ?? "Р¤РёР»СЊРј";
+  const title = movie?.title ?? "Фильм";
 
   return (
     <div className="watch">
@@ -186,17 +186,17 @@ export default function MovieWatchPage() {
               setModalOpen(true);
             }}
           >
-            РќР°РїРёСЃР°С‚СЊ РѕС‚Р·С‹РІ
+            Написать отзыв
           </button>
 
           <div className="section" style={{ marginTop: 18 }}>
             <h3 className="section-title">
-              РћС‚Р·С‹РІС‹ {typeof totalReviews === "number" ? `(${totalReviews})` : ""}
+              Отзывы {typeof totalReviews === "number" ? `(${totalReviews})` : ""}
             </h3>
-            {reviewsQuery.isLoading && <div style={{ opacity: 0.75 }}>Р—Р°РіСЂСѓР·РєР°...</div>}
-            {reviewsQuery.isError && <div style={{ opacity: 0.75 }}>РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РѕС‚Р·С‹РІРѕРІ.</div>}
+            {reviewsQuery.isLoading && <div style={{ opacity: 0.75 }}>Загрузка...</div>}
+            {reviewsQuery.isError && <div style={{ opacity: 0.75 }}>Ошибка загрузки отзывов.</div>}
             {!reviewsQuery.isLoading && reviews.length === 0 && (
-              <div style={{ opacity: 0.75 }}>РџРѕРєР° РЅРµС‚ РѕС‚Р·С‹РІРѕРІ.</div>
+              <div style={{ opacity: 0.75 }}>Пока нет отзывов.</div>
             )}
 
             {reviews.map((review) => (
@@ -215,7 +215,7 @@ export default function MovieWatchPage() {
           </div>
 
           <div className="section card" style={{ marginTop: 18 }}>
-            <h3 className="section-title">РљРѕРјРјРµРЅС‚Р°СЂРёРё</h3>
+            <h3 className="section-title">Комментарии</h3>
             <CommentsSection movieId={movieId} />
           </div>
         </div>
