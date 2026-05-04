@@ -20,18 +20,39 @@
   position: fixed;
   right: 28px;
   bottom: 28px;
-  z-index: 30;
-  display: inline-flex;
+  z-index: 1500;
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 220px;
-  padding: 14px 20px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255, 213, 125, 0.95), rgba(255, 188, 71, 0.9));
-  color: #0b0814;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--void);
   text-decoration: none;
   font-weight: 700;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.24);
+  box-shadow: var(--shadow-gold);
+  transition: transform var(--transition-bounce), box-shadow var(--transition-fast);
+}
+
+.chatbot-action:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 30px rgba(201, 168, 76, 0.5);
+}
+
+/* Add an icon to the chat button */
+.chatbot-action::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2307070F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'%3E%3C/path%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* Hide text */
+.chatbot-action-text {
+  display: none;
 }
 
 .loading {

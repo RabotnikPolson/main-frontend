@@ -90,7 +90,6 @@ export default function HomePage() {
           <div className="genres-grid">
             {genres.slice(0, 12).map(genre => (
               <a key={genre.id} href={`/genres?filter=${genre.name}`} className="genre-card glass">
-                <div className="genre-icon">{genre.icon || '🎬'}</div>
                 <span className="genre-name label">{genre.name}</span>
                 <span className="genre-count text-dim">{genre.movieCount} фильмов</span>
               </a>

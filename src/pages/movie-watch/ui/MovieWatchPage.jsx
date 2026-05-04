@@ -1,9 +1,9 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { CommentsSection } from "@/features/comments";
 import { getStream, useMovie } from "@/features/movies";
-import RightRailTabs from "@/features/recommendations/ui/RightRailTabs";
+import WatchRecommendationsRail from "@/features/recommendations/ui/RightRailTabs";
 import {
   ReviewCard,
   ReviewFormModal,
@@ -206,9 +206,6 @@ export default function MovieWatchPage() {
           <section className="watch-section glass">
             <div className="section-header">
               <h3>Отзывы</h3>
-              <Link to={`/movie/${movieId}/reviews`} className="outline-link">
-                Читать все отзывы
-              </Link>
             </div>
             <div className="reviews-carousel no-scrollbar">
               {reviewsQuery.isLoading && <div className="status-text">Загрузка...</div>}
@@ -227,6 +224,13 @@ export default function MovieWatchPage() {
                   onDelete={() => onDelete(review.id)}
                 />
               ))}
+              {!reviewsQuery.isLoading && reviews.length > 0 && (
+                <div className="reviews-carousel-end">
+                  <Link to={`/movie/${movieId}/reviews`} className="button btn-secondary">
+                    Читать все отзывы
+                  </Link>
+                </div>
+              )}
             </div>
           </section>
 
@@ -237,7 +241,7 @@ export default function MovieWatchPage() {
         </main>
 
         <aside className="watch-sidebar">
-          <RightRailTabs movieId={movieId} />
+          <WatchRecommendationsRail movieId={movieId} />
         </aside>
       </div>
 

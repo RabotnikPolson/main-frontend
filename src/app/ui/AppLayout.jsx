@@ -53,8 +53,8 @@ export default function AppLayout() {
       </main>
 
       {!hideUI && (
-        <Link to="/bot" className="chatbot-action">
-          Чат-помощник
+        <Link to="/bot" className="chatbot-action" aria-label="Чат-помощник">
+          <span className="chatbot-action-text">Чат-помощник</span>
         </Link>
       )}
     </div>
