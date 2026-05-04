@@ -139,8 +139,9 @@
 /* Stats Section */
 .stats-section {
   background: linear-gradient(135deg, var(--deep) 0%, var(--space) 100%);
-  margin: 4rem -2rem;
+  margin: 4rem 0;
   padding: 4rem 2rem;
+  border-radius: var(--radius-xl);
 }
 
 .stats-grid {
@@ -179,6 +180,8 @@
   border-radius: var(--radius-xl);
   position: relative;
   overflow: hidden;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .promo-banner::before {
@@ -219,7 +222,6 @@
 
 .plan-card {
   background: var(--glass);
-  border: 1px solid var(--glass-border);
   padding: 1.5rem;
   border-radius: var(--radius-lg);
   text-align: center;
@@ -229,7 +231,6 @@
 }
 
 .plan-card.featured {
-  border-color: var(--gold);
   box-shadow: var(--shadow-gold);
 }
 
@@ -258,7 +259,6 @@
 
 .promo-teaser {
   background: var(--glass);
-  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 2rem;
   backdrop-filter: var(--backdrop-blur);
@@ -314,7 +314,7 @@
 .announcement-banner {
   background: linear-gradient(135deg, var(--gold-glow) 0%, transparent 100%);
   padding: 2rem 0;
-  margin: 2rem -2rem 0;
+  margin: 2rem 0 0;
 }
 
 .announcement-content {
@@ -324,7 +324,6 @@
   padding: 2rem;
   border-radius: var(--radius-lg);
   background: var(--glass);
-  border: 1px solid var(--glass-border);
   backdrop-filter: var(--backdrop-blur);
   -webkit-backdrop-filter: var(--webkit-backdrop-blur);
 }

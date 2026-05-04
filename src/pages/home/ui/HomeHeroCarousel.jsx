@@ -73,8 +73,26 @@ export default function HomeHeroCarousel() {
 
   if (!sections.length) {
     return (
-      <div style={{ color: "gray", padding: "20px" }}>
-        Добавьте больше фильмов в базу, чтобы рекомендации ожили.
+      <div className="hero-carousel hero-carousel--empty">
+        <div className="container">
+          <div className="carousel-header">
+            <h2>Добро пожаловать в CineVerse</h2>
+            <p>Здесь появятся лучшие фильмы и персональная подборка, как только база пополнится.</p>
+          </div>
+
+          <div className="hero-placeholder-grid">
+            {[1, 2, 3].map((index) => (
+              <div key={index} className="hero-placeholder-card">
+                <div className="hero-placeholder-image" />
+                <div className="hero-placeholder-text">
+                  <div className="hero-placeholder-line" />
+                  <div className="hero-placeholder-line short" />
+                  <div className="hero-placeholder-line" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -83,44 +101,46 @@ export default function HomeHeroCarousel() {
     <div>
       {sections.map((section, index) => (
         <div className="hero-carousel" key={`${section.title}-${index}`}>
-          <div className="carousel-header">
-            <h2>{section.title}</h2>
-            <p>{section.subtitle}</p>
-          </div>
+          <div className="container">
+            <div className="carousel-header">
+              <h2>{section.title}</h2>
+              <p>{section.subtitle}</p>
+            </div>
 
-          <Swiper
-            modules={[Navigation]}
-            slidesPerView={5}
-            spaceBetween={16}
-            navigation
-            breakpoints={{
-              320: { slidesPerView: 1 },
-              1024: { slidesPerView: 4 },
-              1280: { slidesPerView: 5 },
-            }}
-          >
-            {section.items.map((movie) => (
-              <SwiperSlide
-                key={`${section.title}-${movie.id}`}
-                onClick={() => navigate(`/movie/${movie.id || movie.imdbId}`)}
-              >
-                <div className="carousel-card">
-                  <img
-                    src={movie.posterUrl || movie.poster}
-                    alt={movie.title}
-                    className="carousel-poster"
-                  />
-                  <div className="carousel-overlay">
-                    <h3>{movie.title}</h3>
-                    <span>
-                      {movie.year} · {movie.imdbRating || "0"}
-                    </span>
-                    <button className="watch-btn">Смотреть</button>
+            <Swiper
+              modules={[Navigation]}
+              slidesPerView={5}
+              spaceBetween={16}
+              navigation
+              breakpoints={{
+                320: { slidesPerView: 1 },
+                1024: { slidesPerView: 4 },
+                1280: { slidesPerView: 5 },
+              }}
+            >
+              {section.items.map((movie) => (
+                <SwiperSlide
+                  key={`${section.title}-${movie.id}`}
+                  onClick={() => navigate(`/movie/${movie.id || movie.imdbId}`)}
+                >
+                  <div className="carousel-card">
+                    <img
+                      src={movie.posterUrl || movie.poster}
+                      alt={movie.title}
+                      className="carousel-poster"
+                    />
+                    <div className="carousel-overlay">
+                      <h3>{movie.title}</h3>
+                      <span>
+                        {movie.year} · {movie.imdbRating || "0"}
+                      </span>
+                      <button className="watch-btn">Смотреть</button>
+                    </div>
                   </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
         </div>
       ))}
     </div>

@@ -162,7 +162,7 @@ export default function HomePage() {
       <section className="announcement-banner">
         <div className="container">
           <div className="announcement-content glass">
-            <div className="announcement-icon">🎉</div>
+            <div className="announcement-icon"></div>
             <div className="announcement-text">
               <h3 className="announcement-title heading">Новая коллекция казахстанского кино</h3>
               <p className="announcement-description body">Откройте для себя лучшие фильмы местного производства</p>

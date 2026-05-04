@@ -34,7 +34,7 @@
 .details-summary,
 .details-crew,
 .recommendation-section {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: none;
 }
 
 .details-poster-panel {

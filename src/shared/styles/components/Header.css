@@ -4,7 +4,7 @@
   top: 0;
   z-index: 100;
   background: var(--glass);
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: none;
   backdrop-filter: var(--backdrop-blur);
   -webkit-backdrop-filter: var(--webkit-backdrop-blur);
   transition: all var(--transition-normal);
@@ -68,7 +68,7 @@
   display: flex;
   align-items: center;
   background: var(--glass);
-  border: 1px solid var(--glass-border);
+  border: 1px solid transparent;
   border-radius: var(--radius-lg);
   overflow: hidden;
   width: 100%;
@@ -79,8 +79,8 @@
 }
 
 .search-bar:focus-within {
-  border-color: var(--gold);
-  box-shadow: var(--shadow-gold);
+  border-color: rgba(201, 168, 76, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(201, 168, 76, 0.12), var(--shadow-gold);
   background: var(--glass-hover);
 }
 
@@ -110,8 +110,8 @@
   cursor: pointer;
   color: var(--text);
   font-size: 1.125rem;
-  border-left: 1px solid var(--glass-border);
-  transition: color var(--transition-fast);
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  transition: color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .search-btn:hover {
@@ -135,7 +135,7 @@
   background: var(--glass);
   backdrop-filter: var(--backdrop-blur);
   -webkit-backdrop-filter: var(--webkit-backdrop-blur);
-  border: 1px solid var(--glass-border);
+  border: none;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-glass);
   overflow: hidden;
@@ -182,7 +182,7 @@
 .search-footer {
   display: flex;
   justify-content: flex-end;
-  border-top: 1px solid var(--glass-border);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
   padding: 0.5rem;
   background: var(--deep);
 }
@@ -217,7 +217,7 @@
 /* Profile menu */
 .profile-link {
   background: var(--glass);
-  border: 1px solid var(--glass-border);
+  border: 1px solid transparent;
   color: var(--ice);
   text-decoration: none;
   padding: 0.5rem 1rem;
@@ -248,7 +248,7 @@
   background: var(--glass);
   backdrop-filter: var(--backdrop-blur);
   -webkit-backdrop-filter: var(--webkit-backdrop-blur);
-  border: 1px solid var(--glass-border);
+  border: none;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-glass);
   min-width: 200px;
@@ -264,7 +264,7 @@
   font-family: var(--font-body);
   font-weight: 300;
   transition: background var(--transition-fast);
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: none;
 }
 
 .profile-dropdown-item:last-child {
@@ -288,7 +288,7 @@
 .mobile-menu-toggle {
   display: none;
   background: var(--glass);
-  border: 1px solid var(--glass-border);
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
   padding: 0.5rem;
   cursor: pointer;
@@ -323,20 +323,6 @@
   .search-bar {
     max-width: none;
   }
-}
-  border-radius: 8px;
-  font-weight: 500;
-  transition: background .2s, border-color .2s, box-shadow .2s, color .2s;
-}
-.profile-link:hover {
-  background: var(--tile-hover);
-  border-color: var(--primary);
-  color: var(--primary);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 25%, transparent);
-}
-.profile-link:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 35%, transparent);
 }
 
 /* Авторизация (войти / регистрация) */

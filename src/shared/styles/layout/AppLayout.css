@@ -9,6 +9,10 @@
 }
 
 .main-content.with-sidebar {
+  margin-left: 72px;
+}
+
+.sidebar:hover ~ .main-content.with-sidebar {
   margin-left: 240px;
 }
 

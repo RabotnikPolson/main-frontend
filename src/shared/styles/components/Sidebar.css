@@ -4,18 +4,20 @@
   top: 0;
   left: 0;
   height: 100vh;
-  width: 240px;
+  width: 72px;
   background: var(--deep);
-  border-right: 1px solid var(--glass-border);
   backdrop-filter: var(--backdrop-blur);
   -webkit-backdrop-filter: var(--webkit-backdrop-blur);
   z-index: 100;
   transform: translateX(-100%);
-  transition: transform var(--transition-normal);
+  transition: width var(--transition-normal), transform var(--transition-normal);
+  overflow: hidden;
+  border-right: none;
 }
 
-.sidebar.open {
-  transform: translateX(0);
+.sidebar.open,
+.sidebar:hover {
+  width: 240px;
 }
 
 .sidebar-content {
@@ -35,20 +37,26 @@
 .sidebar-link {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.75rem 1.5rem;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.85rem 0;
   color: var(--text);
   text-decoration: none;
   font-family: var(--font-body);
   font-weight: 300;
   transition: all var(--transition-fast);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  margin-right: 1rem;
+  margin-right: 0;
+  min-height: 50px;
 }
 
-.sidebar-link:hover {
+.sidebar-link:hover,
+.sidebar.open .sidebar-link,
+.sidebar:hover .sidebar-link {
   background: var(--glass-hover);
   color: var(--ice);
+  justify-content: flex-start;
+  padding-left: 1.5rem;
 }
 
 .sidebar-link.active {
@@ -65,12 +73,30 @@
   color: var(--text-dim);
   transition: color var(--transition-fast);
   flex-shrink: 0;
+  width: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.sidebar:hover .sidebar-icon,
+.sidebar.open .sidebar-icon {
+  color: var(--gold);
 }
 
 .sidebar-label {
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  opacity: 0;
+  visibility: hidden;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity var(--transition-fast), width var(--transition-fast);
+}
+
+.sidebar:hover .sidebar-label,
+.sidebar.open .sidebar-label {
+  opacity: 1;
+  visibility: visible;
+  width: auto;
 }
 
 /* Mobile overlay */
@@ -102,5 +128,17 @@
 @media (max-width: 1199px) {
   .sidebar {
     z-index: 1000;
+    width: 240px;
+  }
+
+  .sidebar-link {
+    justify-content: flex-start;
+    padding: 0.85rem 1.5rem;
+  }
+
+  .sidebar-label {
+    opacity: 1;
+    visibility: visible;
+    width: auto;
   }
 }

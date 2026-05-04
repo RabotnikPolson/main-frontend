@@ -11,6 +11,11 @@ import { useMovie } from "@/features/movies";
 import { useRecommendationsTab } from "@/features/recommendations";
 import "@/shared/styles/pages/MovieDetails.css";
 
+const normalizeId = (value) => {
+  if (value === undefined || value === null) return null;
+  return String(value);
+};
+
 function RecommendationSection({ title, subtitle, movieId, type }) {
   const { data, isLoading } = useRecommendationsTab(type, movieId, 8);
   const items = data?.recommendations || [];
@@ -74,30 +79,33 @@ export default function MovieDetailsPage() {
   const qc = useQueryClient();
   const { data: movie, isLoading, isError, error } = useMovie(id);
   const { user } = useAuth();
-  const username = user?.username ?? null;
+  const currentUserId = user?.profile?.userId ?? user?.id ?? null;
+  const normalizedUserId = normalizeId(currentUserId);
   const localKey = (value = "guest") => `favorites_${value}`;
 
   const { data: remoteFavIds = [], isLoading: favsLoading } = useQuery({
-    queryKey: ["favorites", username],
+    queryKey: ["favorites", normalizedUserId],
     queryFn: async () => {
-      if (!username) {
+      if (!normalizedUserId) {
         return [];
       }
-      const data = await getFavoritesByUser(username);
-      return Array.isArray(data) ? data.map((item) => item.movieId) : [];
+      const data = await getFavoritesByUser(normalizedUserId);
+      return Array.isArray(data)
+        ? data.map((item) => normalizeId(item.movieId))
+        : [];
     },
-    enabled: !!username,
+    enabled: !!normalizedUserId,
     staleTime: 30000,
   });
 
   const addMut = useMutation({
-    mutationFn: (movieId) => addFavorite(username, movieId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", username] }),
+    mutationFn: (movieId) => addFavorite(normalizedUserId, movieId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", normalizedUserId] }),
   });
 
   const delMut = useMutation({
-    mutationFn: (movieId) => removeFavorite(username, movieId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", username] }),
+    mutationFn: (movieId) => removeFavorite(normalizedUserId, movieId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", normalizedUserId] }),
   });
 
   const [localFavs, setLocalFavs] = useState(() => {
@@ -109,12 +117,12 @@ export default function MovieDetailsPage() {
   });
 
   useEffect(() => {
-    if (!username) {
+    if (!normalizedUserId) {
       try {
         localStorage.setItem(localKey(), JSON.stringify(localFavs));
       } catch {}
     }
-  }, [localFavs, username]);
+  }, [localFavs, normalizedUserId]);
 
   useEffect(() => {
     if (movie) {
@@ -122,16 +130,17 @@ export default function MovieDetailsPage() {
     }
   }, [movie]);
 
-  const favIds = username ? remoteFavIds : localFavs;
   const movieId = movie?.id ?? null;
-  const isFavorite = !!movieId && favIds.includes(movieId);
+  const normalizedMovieId = normalizeId(movieId);
+  const favIds = normalizedUserId ? remoteFavIds : localFavs;
+  const isFavorite = normalizedMovieId ? favIds.includes(normalizedMovieId) : false;
 
   const toggleFavorite = () => {
-    if (!movieId) {
+    if (!movieId || !normalizedMovieId) {
       return;
     }
 
-    if (username) {
+    if (normalizedUserId) {
       if (isFavorite) {
         delMut.mutate(movieId);
       } else {
@@ -141,8 +150,10 @@ export default function MovieDetailsPage() {
     }
 
     setLocalFavs((prev) => {
-      const exists = prev.includes(movieId);
-      const updated = exists ? prev.filter((value) => value !== movieId) : [movieId, ...prev];
+      const exists = prev.includes(normalizedMovieId);
+      const updated = exists
+        ? prev.filter((value) => value !== normalizedMovieId)
+        : [normalizedMovieId, ...prev];
 
       try {
         localStorage.setItem(localKey(), JSON.stringify(updated));
