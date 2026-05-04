@@ -1,0 +1,48 @@
+/* App Layout */
+.app-layout {
+  min-height: 100vh;
+  background: var(--void);
+}
+
+.main-content {
+  transition: margin-left var(--transition-normal);
+}
+
+.main-content.with-sidebar {
+  margin-left: 240px;
+}
+
+.chatbot-action {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  padding: 14px 20px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 213, 125, 0.95), rgba(255, 188, 71, 0.9));
+  color: #0b0814;
+  text-decoration: none;
+  font-weight: 700;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.24);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 1199px) {
+  .main-content.with-sidebar {
+    margin-left: 0;
+  }
+}

@@ -1,177 +1,314 @@
-/* ===== Общая сетка ===== */
-.watch {
-  display: flex;
-  justify-content: center;
-  background: #0f0f0f;
-  padding-top: 24px;
+.watch-page {
   min-height: 100vh;
+  color: var(--text);
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.04), transparent 28%),
+    linear-gradient(180deg, #07070f 0%, #06060c 48%, #05050a 100%);
+  padding: 32px 0 60px;
 }
 
-.watch-grid {
-  display: grid;
-  grid-template-columns: minmax(720px, 1280px) 420px;
-  gap: 24px;
-  width: 100%;
-  max-width: 1720px;
-  padding: 0 24px;
-}
-
-/* ===== Плеер ===== */
-.watch-player {
-  width: 100%;
-  background: #181818;
-  border: 1px solid #2b2b2b;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.watch-player-inner {
-  width: 100%;
-  background: black;
-}
-
-.watch-player-panel {
-  min-height: 360px;
-  aspect-ratio: 16 / 9;
-  padding: 24px;
+.watch-topbar {
+  max-width: 1320px;
+  margin: 0 auto 24px;
+  padding: 18px 24px;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  justify-content: center;
-}
-
-.watch-open-btn {
-  align-self: flex-start;
-  background: #ffffff;
-  color: #111;
-  border: none;
-  border-radius: 10px;
-  padding: 14px 24px;
-  font-size: 20px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.watch-open-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.watch-player-note {
-  color: #d3d3d3;
-  margin: 0;
-  font-size: 15px;
-}
-
-.watch-player-status {
-  color: #b5b5b5;
-  margin: 0;
-  font-size: 14px;
-}
-
-.watch-player-status-error {
-  color: #ff9696;
-}
-
-.watch-embed-controls {
-  margin-top: 8px;
-  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-}
-
-.watch-embed-frame-wrap {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border: 1px solid #2b2b2b;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #111;
-}
-
-.watch-embed-frame {
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-/* Надпись под плеером */
-.watch-player-caption {
-  padding: 12px 16px;
-  font-size: 15px;
-  color: #e5e5e5;
-}
-
-/* ===== Заголовок и описание ===== */
-.watch-title {
-  margin-top: 16px;
-  font-size: 26px;
-  font-weight: 600;
-  color: white;
-}
-
-.watch-meta {
-  display: flex;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.watch-description {
-  color: #aaa;
-  margin-top: 16px;
-  font-size: 15px;
-  line-height: 1.45;
-  max-width: 90%;
-}
-
-/* ===== Боковая колонка ===== */
-.watch-sidebar {
-  display: flex;
-  flex-direction: column;
   gap: 16px;
 }
 
-/* ===== Карточки ===== */
-.card {
-  background: #181818;
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid #2b2b2b;
-  margin-top: 24px;
+.watch-back {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.95rem;
 }
 
-.section {
-  margin-top: 32px;
+.watch-badge {
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-.section-title {
-  color: white;
-  font-size: 20px;
+.watch-grid {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.38fr) minmax(320px, 440px);
+  gap: 28px;
+  padding: 0 24px;
 }
 
-/* Комментарии */
-.muted {
-  color: #777;
-  font-size: 14px;
+.watch-main {
+  display: grid;
+  gap: 24px;
 }
 
-.btn {
-  background: #272727;
-  color: white;
-  border: 1px solid #3a3a3a;
-  padding: 8px 14px;
-  border-radius: 8px;
-  cursor: pointer;
+.watch-player {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  border-radius: var(--radius);
+  background: rgba(13, 18, 32, 0.78);
+  backdrop-filter: blur(26px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-.btn:hover {
-  background: #3a3a3a;
+.watch-player-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
 }
 
-.btn-ghost {
+.watch-player-stage {
+  min-height: 420px;
+  border-radius: calc(var(--radius) - 4px);
+  background: rgba(0, 0, 0, 0.48);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.watch-player-status,
+.watch-player-fallback {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  text-align: center;
+  max-width: 100%;
+}
+
+.watch-player-status-error {
+  color: #f7b500;
+  display: grid;
+  gap: 10px;
+}
+
+.watch-video-card {
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #040406;
+}
+
+.watch-player-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.watch-quality {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.watch-headline,
+.watch-section {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  border-radius: var(--radius);
+  background: rgba(13, 18, 32, 0.72);
+  backdrop-filter: blur(26px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.watch-headline {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.watch-headline h1 {
+  margin: 0;
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+}
+
+.watch-headline p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+
+.section-header h3,
+.watch-section h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.outline-link {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.outline-link:hover {
+  border-color: var(--gold);
+}
+
+.reviews-carousel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 320px));
+  gap: 16px;
+  overflow-x: auto;
+}
+
+.reviews-carousel > * {
+  min-width: 240px;
+}
+
+.status-text {
+  color: var(--text-secondary);
+}
+
+.watch-sidebar {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+}
+
+.button {
+  min-width: 180px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), rgba(255, 205, 100, 0.85));
+  color: #0b0814;
+}
+
+.button.button--ghost {
   background: transparent;
-  border: none;
-  color: #aaa;
-  padding: 6px 8px;
-  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text);
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+@media (max-width: 1120px) {
+  .watch-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .watch-sidebar {
+    position: static;
+    top: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .watch-topbar,
+  .watch-player,
+  .watch-headline,
+  .watch-section {
+    padding: 18px;
+  }
+
+  .watch-grid {
+    gap: 20px;
+    padding: 0 16px;
+  }
+
+  .reviews-carousel {
+    grid-template-columns: 1fr;
+  }
+}
+
+.right-rail {
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: rgba(13, 18, 32, 0.72);
+  backdrop-filter: blur(26px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.right-rail h3 {
+  margin: 0;
+  color: var(--text);
+}
+
+.right-rail-block {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border-radius: calc(var(--radius) - 4px);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.block-header h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.block-header p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.94rem;
+}
+
+.right-rail-list {
+  display: grid;
+  gap: 12px;
+}
+
+.rail-card {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 12px;
+  padding: 10px;
+  border-radius: calc(var(--radius) - 4px);
+  background: rgba(0, 0, 0, 0.24);
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.rail-card:hover {
+  transform: translateX(2px);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.rail-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.rail-card strong {
+  display: block;
+  font-size: 0.98rem;
+  color: var(--text);
+}
+
+.rail-card span {
+  display: block;
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.right-rail-empty {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
 }

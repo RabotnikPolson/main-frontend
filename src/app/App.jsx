@@ -16,6 +16,7 @@ const HistoryPage = lazy(() => import("@/pages/history/ui/HistoryPage"));
 const MovieDetailsPage = lazy(() => import("@/pages/movie-details/ui/MovieDetailsPage"));
 const MovieWatchPage = lazy(() => import("@/pages/movie-watch/ui/MovieWatchPage"));
 const MovieReviewsPage = lazy(() => import("@/pages/movie-reviews/ui/MovieReviewsPage"));
+const ChatBotPage = lazy(() => import("@/pages/chat-bot/ui/ChatBotPage"));
 const LoginPage = lazy(() => import("@/pages/auth/ui/LoginPage"));
 const RegisterPage = lazy(() => import("@/pages/auth/ui/RegisterPage"));
 const SettingsPage = lazy(() => import("@/pages/settings/ui/SettingsPage"));
@@ -50,6 +51,7 @@ export default function App() {
             <Route path="movie/:id" element={<MovieDetailsPage />} />
             <Route path="movie/:id/watch" element={<MovieWatchPage />} />
             <Route path="movie/:id/reviews" element={<MovieReviewsPage />} />
+            <Route path="bot" element={<ChatBotPage />} />
 
             <Route
               path="add-movie"

@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { CommentsSection } from "@/features/comments";
 import { getStream, useMovie } from "@/features/movies";
-import { RightRailTabs } from "@/features/recommendations";
+import RightRailTabs from "@/features/recommendations/ui/RightRailTabs";
 import {
   ReviewCard,
   ReviewFormModal,
@@ -14,52 +14,50 @@ import {
 import { WatchTracker } from "@/features/watch-history";
 import "@/shared/styles/pages/MovieWatch.css";
 
-function MoviePlayer({ streamData, title, isLoading, isError, onRetry, movieId }) {
-  const [showEmbed, setShowEmbed] = useState(false);
-
-  const onOpenPlayer = () => {
-    if (!streamData?.url) {
-      return;
-    }
-
-    window.open(streamData.url, "_blank", "noopener,noreferrer");
-  };
-
+function MoviePlayer({ streamData, isLoading, isError, onRetry, movieId }) {
   return (
-    <div className="watch-player">
-      <div className="watch-player-inner">
-        <div className="watch-player-panel">
-          <button className="watch-open-btn" onClick={onOpenPlayer} disabled={!streamData?.url || isLoading}>
-            Открыть в новой вкладке
-          </button>
-
-          {isLoading && <p className="watch-player-status">Загрузка видео...</p>}
-          {isError && (
-            <p className="watch-player-status watch-player-status-error">
-              Не удалось загрузить видео.{" "}
-              <button className="btn-ghost" onClick={onRetry}>
-                Повторить
-              </button>
-            </p>
-          )}
-
-          {!!streamData?.url && (
-            <div className="watch-embed-controls" style={{ marginTop: "10px" }}>
-              <button className="btn" onClick={() => setShowEmbed((value) => !value)}>
-                {showEmbed ? "Скрыть плеер" : "Смотреть прямо здесь"}
-              </button>
-            </div>
-          )}
-
-          {showEmbed && !!streamData?.url && (
-            <div className="watch-embed-frame-wrap" style={{ marginTop: "15px" }}>
-              <WatchTracker url={streamData.url} movieId={movieId} />
-            </div>
-          )}
-        </div>
+    <div className="watch-player glass">
+      <div className="watch-player-top">
+        <span>Видео</span>
+        <button className="button button--ghost" onClick={onRetry} disabled={isLoading}>
+          Обновить источник
+        </button>
       </div>
 
-      {title && <div className="watch-player-caption">{title}</div>}
+      <div className="watch-player-stage">
+        {isLoading && <div className="watch-player-status">Загрузка видео...</div>}
+        {isError && (
+          <div className="watch-player-status watch-player-status-error">
+            Не удалось загрузить видео.
+            <button className="button button--ghost" onClick={onRetry}>
+              Повторить
+            </button>
+          </div>
+        )}
+
+        {!isLoading && !isError && streamData?.url ? (
+          <div className="watch-video-card">
+            <WatchTracker url={streamData.url} movieId={movieId} />
+          </div>
+        ) : (
+          !isLoading && (
+            <div className="watch-player-fallback">
+              Источник недоступен. Попробуйте открыть в новой вкладке.
+            </div>
+          )
+        )}
+      </div>
+
+      <div className="watch-player-bottom">
+        <button
+          className="button btn-primary"
+          onClick={() => window.open(streamData?.url, "_blank", "noopener,noreferrer")}
+          disabled={!streamData?.url || isLoading}
+        >
+          Открыть в новой вкладке
+        </button>
+        {streamData?.quality && <span className="watch-quality">{streamData.quality}</span>}
+      </div>
     </div>
   );
 }
@@ -83,7 +81,7 @@ export default function MovieWatchPage() {
 
   useEffect(() => {
     if (movie?.title) {
-      document.title = `${movie.title} - Cinema App`;
+      document.title = `${movie.title} — CineVerse`;
     }
   }, [movie?.title]);
 
@@ -110,7 +108,6 @@ export default function MovieWatchPage() {
       } else {
         await mutations.createReview.mutateAsync({ content, score });
       }
-
       setModalOpen(false);
       setEditing(null);
     } catch (reviewError) {
@@ -123,11 +120,9 @@ export default function MovieWatchPage() {
     if (!reviewId) {
       return;
     }
-
     if (!window.confirm("Удалить отзыв?")) {
       return;
     }
-
     try {
       await mutations.deleteReview.mutateAsync(reviewId);
     } catch (reviewError) {
@@ -162,69 +157,88 @@ export default function MovieWatchPage() {
     );
   }
 
-  const title = movie?.title ?? "Фильм";
+  const title = movie.title || "Фильм";
+  const meta = [
+    movie.year && `Год: ${movie.year}`,
+    movie.runtime && `Длительность: ${movie.runtime} мин`,
+    movie.genre && `Жанр: ${movie.genre}`,
+    movie.imdbRating && `IMDb: ${movie.imdbRating}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
-    <div className="watch">
+    <div className="watch-page">
+      <div className="watch-topbar glass">
+        <Link to={`/movie/${movieId}`} className="watch-back">
+          Вернуться к описанию
+        </Link>
+        <span className="watch-badge">Смотреть</span>
+      </div>
+
       <div className="watch-grid">
-        <div className="watch-main">
+        <main className="watch-main">
           <MoviePlayer
             streamData={streamQuery.data}
-            title={title}
             isLoading={streamQuery.isLoading}
             isError={streamQuery.isError}
             onRetry={() => streamQuery.refetch()}
             movieId={movieId}
           />
 
-          <h1 className="watch-title">{title}</h1>
-
-          <button
-            className="btn"
-            onClick={() => {
-              setEditing(null);
-              setModalOpen(true);
-            }}
-          >
-            Написать отзыв
-          </button>
-
-          <div className="section" style={{ marginTop: 18 }}>
-            <h3 className="section-title">
-              Отзывы {typeof totalReviews === "number" ? `(${totalReviews})` : ""}
-            </h3>
-            {reviewsQuery.isLoading && <div style={{ opacity: 0.75 }}>Загрузка...</div>}
-            {reviewsQuery.isError && <div style={{ opacity: 0.75 }}>Ошибка загрузки отзывов.</div>}
-            {!reviewsQuery.isLoading && reviews.length === 0 && (
-              <div style={{ opacity: 0.75 }}>Пока нет отзывов.</div>
-            )}
-
-            {reviews.map((review) => (
-              <ReviewCard
-                key={review.id}
-                review={review}
-                onReadFull={openRead}
-                isOwner={false}
-                onEdit={() => {
-                  setEditing(review);
-                  setModalOpen(true);
-                }}
-                onDelete={() => onDelete(review.id)}
-              />
-            ))}
+          <div className="watch-headline glass">
+            <div>
+              <h1>{title}</h1>
+              <p>{meta}</p>
+            </div>
+            <button className="button btn-primary" onClick={() => setModalOpen(true)}>
+              Написать отзыв
+            </button>
           </div>
 
-          <div className="section card" style={{ marginTop: 18 }}>
-            <h3 className="section-title">Комментарии</h3>
+          <section className="watch-section glass">
+            <div className="section-header">
+              <h3>Описание</h3>
+            </div>
+            <p>{movie.description || "Описание отсутствует."}</p>
+          </section>
+
+          <section className="watch-section glass">
+            <div className="section-header">
+              <h3>Отзывы</h3>
+              <Link to={`/movie/${movieId}/reviews`} className="outline-link">
+                Читать все отзывы
+              </Link>
+            </div>
+            <div className="reviews-carousel no-scrollbar">
+              {reviewsQuery.isLoading && <div className="status-text">Загрузка...</div>}
+              {reviewsQuery.isError && <div className="status-text">Ошибка загрузки отзывов.</div>}
+              {!reviewsQuery.isLoading && reviews.length === 0 && <div className="status-text">Пока нет отзывов.</div>}
+              {reviews.map((review) => (
+                <ReviewCard
+                  key={review.id}
+                  review={review}
+                  onReadFull={openRead}
+                  isOwner={false}
+                  onEdit={() => {
+                    setEditing(review);
+                    setModalOpen(true);
+                  }}
+                  onDelete={() => onDelete(review.id)}
+                />
+              ))}
+            </div>
+          </section>
+
+          <section className="watch-section glass">
+            <h3>Комментарии</h3>
             <CommentsSection movieId={movieId} />
-          </div>
-        </div>
+          </section>
+        </main>
 
-        {!!movieId && (
-          <div className="watch-sidebar" style={{ position: "sticky", top: 20, height: "calc(100vh - 40px)", overflow: "hidden" }}>
-            <RightRailTabs movieId={movieId} />
-          </div>
-        )}
+        <aside className="watch-sidebar">
+          <RightRailTabs movieId={movieId} />
+        </aside>
       </div>
 
       <ReviewFormModal

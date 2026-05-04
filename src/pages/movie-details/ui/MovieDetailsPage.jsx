@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/features/auth";
@@ -9,108 +9,62 @@ import {
 } from "@/features/favorites";
 import { useMovie } from "@/features/movies";
 import { useRecommendationsTab } from "@/features/recommendations";
-import { useUserProfile } from "@/features/user-profile";
 import "@/shared/styles/pages/MovieDetails.css";
 
-function RecommendationTabs({ movieId }) {
-  const tabs = [
-    { id: "franchise", label: "Продолжение" },
-    { id: "content", label: "Похожие (AI)" },
-    { id: "director", label: "Режиссер" },
-    { id: "actor", label: "Актеры" },
-    { id: "genre", label: "По жанру" },
-    { id: "collaborative-item", label: "Смотрят также" },
-  ];
-
-  const [activeTab, setActiveTab] = useState("franchise");
-  const { data, isLoading } = useRecommendationsTab(activeTab, movieId, 6);
+function RecommendationSection({ title, subtitle, movieId, type }) {
+  const { data, isLoading } = useRecommendationsTab(type, movieId, 8);
   const items = data?.recommendations || [];
 
+  if (!items.length && !isLoading) {
+    return null;
+  }
+
   return (
-    <div className="recommendation-tabs" style={{ marginTop: 40 }}>
-      <h3 style={{ marginBottom: 16 }}>Рекомендации для вас</h3>
-      <div
-        className="tabs-header"
-        style={{
-          display: "flex",
-          gap: 12,
-          borderBottom: "1px solid var(--border)",
-          marginBottom: 16,
-          overflowX: "auto",
-          paddingBottom: 8,
-        }}
-      >
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            style={{
-              padding: "8px 16px",
-              background: activeTab === tab.id ? "var(--primary)" : "transparent",
-              color: activeTab === tab.id ? "#fff" : "var(--text-secondary)",
-              border: "none",
-              borderRadius: 6,
-              cursor: "pointer",
-              fontWeight: 600,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
+    <section className="recommendation-section glass">
+      <div className="section-header">
+        <div>
+          <h3>{title}</h3>
+          <p>{subtitle}</p>
+        </div>
       </div>
 
       {isLoading ? (
-        <div style={{ color: "var(--text-secondary)" }}>Загрузка...</div>
-      ) : items.length === 0 ? (
-        <div style={{ color: "var(--text-secondary)" }}>Рекомендаций пока нет.</div>
+        <div className="section-empty">Загрузка...</div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 16 }}>
-          {items.map((movie) => {
+        <div className="recommendation-row no-scrollbar">
+          {items.map((item) => {
             const posterSrc =
-              movie.poster_url ||
-              `https://placehold.jp/333/fff/300x450.png?text=${encodeURIComponent(movie.title)}`;
+              item.poster_url ||
+              `https://placehold.jp/333/fff/300x450.png?text=${encodeURIComponent(item.title)}`;
 
             return (
               <Link
-                key={movie.movie_id}
-                to={`/movie/${movie.movie_id}`}
-                style={{ textDecoration: "none", color: "inherit" }}
-                onClick={() => window.scrollTo(0, 0)}
+                key={item.movie_id}
+                to={`/movie/${item.movie_id}`}
+                className="recommendation-card"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
-                <div
-                  style={{
-                    borderRadius: 8,
-                    overflow: "hidden",
-                    aspectRatio: "2/3",
-                    background: "var(--surface)",
-                    border: "1px solid var(--border)",
-                  }}
-                >
+                <div className="recommendation-cover">
                   <img
                     src={posterSrc}
-                    alt={movie.title}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    alt={item.title}
+                    loading="lazy"
                     onError={(event) => {
                       event.currentTarget.src =
                         "https://placehold.jp/333/fff/300x450.png?text=No+Image";
                     }}
                   />
                 </div>
-                <div style={{ marginTop: 8, fontSize: 13, fontWeight: 500, lineHeight: 1.2 }}>
-                  {movie.title}
+                <div className="recommendation-body">
+                  <strong>{item.title}</strong>
+                  <span>{item.year || item.release_year || "—"}</span>
                 </div>
-                {movie.reason && (
-                  <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
-                    {movie.reason}
-                  </div>
-                )}
               </Link>
             );
           })}
         </div>
       )}
-    </div>
+    </section>
   );
 }
 
@@ -121,32 +75,29 @@ export default function MovieDetailsPage() {
   const { data: movie, isLoading, isError, error } = useMovie(id);
   const { user } = useAuth();
   const username = user?.username ?? null;
-  const { data: profile } = useUserProfile();
-  const userId = profile?.userId ?? null;
   const localKey = (value = "guest") => `favorites_${value}`;
 
   const { data: remoteFavIds = [], isLoading: favsLoading } = useQuery({
-    queryKey: ["favorites", userId],
+    queryKey: ["favorites", username],
     queryFn: async () => {
-      if (!userId) {
+      if (!username) {
         return [];
       }
-
-      const data = await getFavoritesByUser(userId);
+      const data = await getFavoritesByUser(username);
       return Array.isArray(data) ? data.map((item) => item.movieId) : [];
     },
-    enabled: !!username && !!userId,
+    enabled: !!username,
     staleTime: 30000,
   });
 
   const addMut = useMutation({
-    mutationFn: (movieId) => addFavorite(userId, movieId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", userId] }),
+    mutationFn: (movieId) => addFavorite(username, movieId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", username] }),
   });
 
   const delMut = useMutation({
-    mutationFn: (movieId) => removeFavorite(userId, movieId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", userId] }),
+    mutationFn: (movieId) => removeFavorite(username, movieId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", username] }),
   });
 
   const [localFavs, setLocalFavs] = useState(() => {
@@ -167,11 +118,11 @@ export default function MovieDetailsPage() {
 
   useEffect(() => {
     if (movie) {
-      document.title = `${movie.title} - Cinema App`;
+      document.title = `${movie.title} — CineVerse`;
     }
   }, [movie]);
 
-  const favIds = username && userId ? remoteFavIds : localFavs;
+  const favIds = username ? remoteFavIds : localFavs;
   const movieId = movie?.id ?? null;
   const isFavorite = !!movieId && favIds.includes(movieId);
 
@@ -180,7 +131,7 @@ export default function MovieDetailsPage() {
       return;
     }
 
-    if (username && userId) {
+    if (username) {
       if (isFavorite) {
         delMut.mutate(movieId);
       } else {
@@ -200,6 +151,34 @@ export default function MovieDetailsPage() {
       return updated;
     });
   };
+
+  const cast = useMemo(() => {
+    const raw = movie?.raw?.actors || movie?.raw?.Actors || movie?.actors;
+    if (!raw) {
+      return [];
+    }
+    return raw
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .slice(0, 10);
+  }, [movie]);
+
+  const creators = useMemo(() => {
+    const director = movie?.raw?.director || movie?.raw?.Director;
+    const writer = movie?.raw?.writer || movie?.raw?.Writer;
+    return [director, writer]
+      .filter(Boolean)
+      .flatMap((value) => String(value).split(",").map((item) => item.trim()))
+      .filter(Boolean);
+  }, [movie]);
+
+  const posterSrc =
+    movie?.poster ||
+    movie?.posterUrl ||
+    `https://placehold.jp/333/fff/400x600.png?text=${encodeURIComponent(movie?.title || "No+Image")}`;
+
+  const backdropSrc = movie?.backdrop || movie?.backdropUrl || posterSrc;
 
   if (isLoading) {
     return <div className="loading container">Загрузка фильма...</div>;
@@ -227,79 +206,144 @@ export default function MovieDetailsPage() {
     );
   }
 
-  const posterSrc =
-    movie.poster ||
-    `https://placehold.jp/333/fff/400x600.png?text=${encodeURIComponent(movie.title)}`;
-
   return (
-    <div className="container details-page">
-      <Link to="/" className="back-link">
-        Назад
-      </Link>
-
-      <div className="details-layout">
-        <div className="left">
-          <img
-            className="details-poster"
-            src={posterSrc}
-            alt={movie.title}
-            loading="lazy"
-            onError={(event) => {
-              event.currentTarget.src =
-                "https://placehold.jp/333/fff/400x600.png?text=No+Image";
-            }}
-          />
-
-          <div className="actions">
-            <button
-              className="button"
-              onClick={toggleFavorite}
-              disabled={addMut.isPending || delMut.isPending || favsLoading}
-            >
-              {isFavorite ? "В избранном" : "Добавить в избранное"}
-            </button>
-
-            <button className="button button--ghost" onClick={() => navigate(`/movie/${id}/watch`)}>
-              Смотреть
-            </button>
-          </div>
-        </div>
-
-        <div className="details-info">
-          <h2>{movie.title}</h2>
-
-          <div className="meta">
-            <strong>Год:</strong> {movie.year ?? "-"} · <strong>Жанр:</strong> {movie.genre || "-"} ·{" "}
-            <strong>IMDb:</strong> {movie.imdbRating ?? "-"}
+    <div className="details-page">
+      <div
+        className="details-hero"
+        style={{
+          backgroundImage: `linear-gradient(180deg, rgba(7,7,15,0.92) 0%, rgba(7,7,15,0.62) 35%, rgba(7,7,15,0.92) 100%), url(${backdropSrc})`,
+        }}
+      >
+        <div className="details-hero-grid">
+          <div className="details-poster-panel glass">
+            <img
+              className="details-poster"
+              src={posterSrc}
+              alt={movie.title}
+              loading="lazy"
+              onError={(event) => {
+                event.currentTarget.src =
+                  "https://placehold.jp/333/fff/400x600.png?text=No+Image";
+              }}
+            />
+            <div className="details-poster-meta">
+              <span>{movie.year || "—"}</span>
+              <span>{movie.runtime || "—"} мин</span>
+              <span>{movie.age || movie.rating || "—"}</span>
+            </div>
           </div>
 
-          <p className="description">
-            <strong>Описание:</strong>
-            <br />
-            {movie.description || "Описание отсутствует."}
-          </p>
+          <div className="details-hero-copy glass">
+            <div className="details-tagline">{movie.tagline || movie.subtitle || "Смотреть в высоком качестве"}</div>
+            <h1 className="details-title">{movie.title}</h1>
+            <p className="details-subtitle">{movie.originalTitle || movie.title}</p>
 
-          <div className="more">
-            <p>
-              <strong>Длительность:</strong> {movie.runtime ?? "-"}
-            </p>
-            <p>
-              <strong>Режиссер:</strong> {movie.raw?.director || movie.raw?.Director || "-"}
-            </p>
-            <p>
-              <strong>Актеры:</strong> {movie.raw?.actors || movie.raw?.Actors || "-"}
-            </p>
-            <p>
-              <strong>Язык:</strong> {movie.raw?.language || movie.raw?.Language || "-"}
-            </p>
-            <p>
-              <strong>Страна:</strong> {movie.raw?.country || movie.raw?.Country || "-"}
-            </p>
+            <div className="details-chips">
+              {(movie.genre || "").split(",").slice(0, 4).map((genre) => (
+                <span key={genre} className="details-chip">
+                  {genre.trim()}
+                </span>
+              ))}
+            </div>
+
+            <div className="details-ratings">
+              <div className="details-score">
+                <strong>{movie.rating?.toFixed(1) || movie.imdbRating || "—"}</strong>
+                <span>Рейтинг</span>
+              </div>
+              <div className="details-data">
+                <div>
+                  <strong>{movie.votes || movie.vote_count || "—"}</strong>
+                  <span>голосов</span>
+                </div>
+                <div>
+                  <strong>{movie.popularity || "—"}</strong>
+                  <span>популярность</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="details-actions">
+              <button className="button btn-primary" onClick={() => navigate(`/movie/${id}/watch`)}>
+                Смотреть
+              </button>
+              <button
+                className={`button button--ghost ${isFavorite ? "favorite-active" : ""}`}
+                onClick={toggleFavorite}
+                disabled={addMut.isPending || delMut.isPending || favsLoading}
+              >
+                {isFavorite ? "В избранном" : "В избранное"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <RecommendationTabs movieId={movie.id} />
+      <div className="details-body container">
+        <div className="details-summary glass">
+          <h2>Описание</h2>
+          <p>{movie.description || "Описание отсутствует."}</p>
+        </div>
+
+        <div className="details-crew glass">
+          <div className="details-crew-block">
+            <h3>Авторы</h3>
+            <div className="details-crew-grid">
+              {creators.map((name) => (
+                <div key={name} className="details-crew-card">
+                  <div className="details-crew-avatar">{name.split(" ").map((part) => part[0]).join("")}</div>
+                  <div>
+                    <div className="details-crew-name">{name}</div>
+                    <div className="details-crew-role">Авторы</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="details-crew-block">
+            <h3>Актеры</h3>
+            <div className="details-cast-grid">
+              {cast.map((actor) => (
+                <div key={actor} className="details-cast-card">
+                  <div className="details-cast-avatar">{actor.split(" ").map((part) => part[0]).join("")}</div>
+                  <div className="details-cast-name">{actor}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="details-sections">
+          <RecommendationSection
+            title="Серия фильмов"
+            subtitle="Автоматические продолжения и предыдущие части"
+            type="franchise"
+            movieId={movie.id}
+          />
+
+          <RecommendationSection
+            title="Похожие фильмы"
+            subtitle="Фильмы с похожим визуальным стилем и настроением"
+            type="content"
+            movieId={movie.id}
+          />
+
+          <RecommendationSection
+            title="Рекомендации для вас"
+            subtitle="Подборка на основе ваших просмотров"
+            type="hybrid"
+            movieId={movie.id}
+          />
+
+          <RecommendationSection
+            title="Другие истории жанра"
+            subtitle="Дополнительный контент из этой категории"
+            type="genre"
+            movieId={movie.id}
+          />
+        </div>
+      </div>
     </div>
   );
 }

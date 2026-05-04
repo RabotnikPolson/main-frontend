@@ -22,7 +22,7 @@ function saveHistory(arr) {
   } catch {}
 }
 
-export default function Header() {
+export default function Header({ onMenuClick }) {
   const { user, logout } = useAuth();
   const { data: movies = [] } = useMovies();
   const [params] = useSearchParams();
@@ -32,6 +32,7 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState(loadHistory());
   const [highlight, setHighlight] = useState(-1);
+  const [scrolled, setScrolled] = useState(false);
   const inputRef = useRef(null);
   const menuRef = useRef(null);
 
@@ -41,6 +42,15 @@ export default function Header() {
     setOpen(false);
     setHighlight(-1);
   }, [location.search, params]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 60);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const dictionary = useMemo(() => {
     const terms = new Set();
@@ -164,11 +174,12 @@ export default function Header() {
   };
 
   return (
-    <header className="header">
+    <header className={`header ${scrolled ? 'scrolled' : ''}`}>
       <div className="header-inner">
         <div className="header-left">
           <Link to="/" className="header-title">
-            Cinema&nbsp;App
+            <span className="logo-cine">CINE</span>
+            <span className="logo-verse">VERSE</span>
           </Link>
         </div>
 
@@ -235,6 +246,14 @@ export default function Header() {
             </div>
           )}
         </div>
+
+        <button
+          className="mobile-menu-toggle"
+          onClick={onMenuClick}
+          aria-label="Открыть меню"
+        >
+          ☰
+        </button>
 
         <div className="header-right">
           {user ? (
