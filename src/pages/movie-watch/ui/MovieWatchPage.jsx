@@ -215,6 +215,7 @@ export default function MovieWatchPage() {
                 <ReviewCard
                   key={review.id}
                   review={review}
+                  moviePoster={movie.poster || movie.posterUrl}
                   onReadFull={openRead}
                   isOwner={false}
                   onEdit={() => {
