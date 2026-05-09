@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import ReviewCard from "../components/ReviewCard";
-import { useReviews } from "../hooks/useReviews";
+import { useReviewsByMovie } from "../hooks/useReviews";
 
 export default function MovieReviews() {
     const { movieId } = useParams();
@@ -9,7 +9,7 @@ export default function MovieReviews() {
 
     const [page, setPage] = useState(0);
 
-    const { data, isLoading } = useReviews(numericMovieId, page, 20);
+    const { data, isLoading } = useReviewsByMovie(numericMovieId, page, 20);
 
     const items = data?.items ?? [];
 
