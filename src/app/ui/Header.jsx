@@ -174,22 +174,30 @@ export default function Header({ onMenuClick }) {
   };
 
   return (
-    <header className={`header ${scrolled ? 'scrolled' : ''}`}>
+    <header className={`header glass-nav ${scrolled ? 'scrolled' : ''}`}>
       <div className="header-inner">
         <div className="header-left">
           <Link to="/" className="header-title">
-            <span className="logo-cine">CINE</span>
-            <span className="logo-verse">VERSE</span>
+            <span className="logo-icon">🎬</span>
+            <span className="logo-text">СИНЕМА</span>
           </Link>
+          
+          <nav className="header-nav-desktop">
+            <Link to="/" className="nav-link">Главная</Link>
+            <Link to="/?q=" className="nav-link">Фильмы</Link>
+            <Link to="/" className="nav-link">Сериалы</Link>
+            <Link to="/profile" className="nav-link">Мой список</Link>
+          </nav>
         </div>
 
         <div className="header-center">
           <form onSubmit={submit} className="search-bar" role="search" onFocus={() => setOpen(true)}>
+            <span className="search-icon">🔍</span>
             <input
               ref={inputRef}
               type="text"
               className="search-input"
-              placeholder="Введите запрос"
+              placeholder="Поиск по названию..."
               value={q}
               onChange={(event) => {
                 setQ(event.target.value);
@@ -205,12 +213,9 @@ export default function Header({ onMenuClick }) {
                 aria-label="Очистить запрос"
                 onClick={clearQuery}
               >
-                x
+                ✕
               </button>
             )}
-            <button type="submit" className="search-btn" aria-label="Поиск">
-              Поиск
-            </button>
           </form>
 
           {open && suggestions.length > 0 && (
@@ -256,17 +261,21 @@ export default function Header({ onMenuClick }) {
         </button>
 
         <div className="header-right">
+          <button className="header-icon-btn" title="Поиск">
+            
+          </button>
+          
           {user ? (
             <>
               {user?.profile && user?.profile?.roles && String(user.profile.roles).toLowerCase().includes("admin") ? (
-                <Link to="/admin/movies" className="auth-link">
-                  Админка
+                <Link to="/admin/movies" className="header-icon-btn" title="Админка">
+                  ⚙️
                 </Link>
               ) : null}
-              <Link to="/profile" className="profile-link">
-                @{user.username}
-              </Link>
-              <button type="button" className="logout-btn" onClick={logout}>
+              <div className="header-user-avatar" title={`@${user.username}`}>
+                {user.username?.charAt(0).toUpperCase()}
+              </div>
+              <button type="button" className="auth-link logout-btn" onClick={logout}>
                 Выйти
               </button>
             </>
@@ -275,7 +284,7 @@ export default function Header({ onMenuClick }) {
               <Link to="/login" className="auth-link">
                 Войти
               </Link>
-              <Link to="/register" className="auth-link">
+              <Link to="/register" className="auth-link primary">
                 Регистрация
               </Link>
             </>

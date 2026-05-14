@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import Header from "@/app/ui/Header";
 import Sidebar from "@/app/ui/Sidebar";
 import Footer from "@/app/ui/Footer";
+import WelcomeModal from "@/shared/ui/WelcomeModal";
 import "@/shared/styles/layout/AppLayout.css";
 
 export default function AppLayout() {
@@ -57,6 +58,8 @@ export default function AppLayout() {
           <span className="chatbot-action-text">Чат-помощник</span>
         </Link>
       )}
+
+      {!hideUI && <WelcomeModal />}
     </div>
   );
 }

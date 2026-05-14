@@ -1,0 +1,249 @@
+/* Modern Cinema Hero Banner */
+.hero-banner {
+  position: relative;
+  width: 100%;
+  height: 45vh;
+  min-height: 580px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  margin: 0;
+  margin-top: -60px;
+  padding-top: 60px;
+}
+
+.hero-banner-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.hero-banner:hover .hero-banner-image {
+  opacity: 0.8;
+}
+
+.hero-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(15, 23, 42, 0.3),
+    rgba(15, 23, 42, 0.7),
+    rgba(15, 23, 42, 1)
+  );
+  z-index: 1;
+}
+
+.hero-banner-gradient-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(15, 23, 42, 0.5),
+    transparent
+  );
+  z-index: 1;
+}
+
+.hero-banner-gradient-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 30%;
+  background: linear-gradient(
+    to bottom,
+    rgba(15, 23, 42, 0.3),
+    transparent
+  );
+  z-index: 1;
+}
+
+.hero-banner-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1400px;
+  padding: 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .hero-banner-content {
+    padding: 1.5rem 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-banner {
+    height: 50vh;
+    min-height: 300px;
+    padding-top: 50px;
+    margin-top: -50px;
+  }
+  
+  .hero-banner-content {
+    padding: 1.5rem 1rem;
+  }
+}
+
+.hero-banner-label {
+  display: inline-block;
+  color: #ef4444;
+  font-weight: bold;
+  font-size: 0.875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.hero-banner-title {
+  font-size: clamp(1.75rem, 5vw, 3.5rem);
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+  max-width: 700px;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8);
+  letter-spacing: -0.02em;
+}
+
+.hero-banner-description {
+  font-size: clamp(0.875rem, 1.5vw, 1rem);
+  color: #cbd5e1;
+  line-height: 1.5;
+  max-width: 550px;
+  margin-bottom: 1rem;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+
+.hero-banner-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.rating-stars {
+  color: #fbbf24;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+}
+
+.rating-value {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.rating-year {
+  padding-left: 0.8rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hero-banner-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.hero-btn-primary {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+}
+
+.hero-btn-primary:hover {
+  background: #f1f5f9;
+  box-shadow: 0 12px 32px rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.hero-btn-primary:active {
+  transform: translateY(0);
+}
+
+.hero-btn-secondary {
+  background: rgba(30, 41, 59, 0.8);
+  color: #ffffff;
+  border: 2px solid rgba(148, 163, 184, 0.4);
+  backdrop-filter: blur(8px);
+}
+
+.hero-btn-secondary:hover {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(148, 163, 184, 0.8);
+  box-shadow: 0 8px 24px rgba(148, 163, 184, 0.2);
+  transform: translateY(-2px);
+}
+
+.hero-btn-secondary:active {
+  transform: translateY(0);
+}
+
+.hero-btn-icon {
+  display: inline-block;
+  width: 1.25rem;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .hero-banner-label {
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-banner-title {
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-banner-description {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+
+  .hero-banner-rating {
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+  }
+
+  .hero-banner-actions {
+    gap: 0.5rem;
+  }
+
+  .hero-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    gap: 0.5rem;
+  }
+}

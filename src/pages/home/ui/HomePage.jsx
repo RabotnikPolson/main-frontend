@@ -2,6 +2,7 @@ import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/features/auth";
 import { useMovies, useGenres } from "@/features/movies";
+import HeroBanner from "@/shared/ui/HeroBanner";
 import HomeHeroCarousel from "@/pages/home/ui/HomeHeroCarousel";
 import { MovieGrid } from "@/shared/ui";
 import "@/shared/styles/pages/Home.css";
@@ -33,8 +34,14 @@ export default function HomePage() {
     );
   });
 
+  // Get featured movie for hero banner
+  const featuredMovie = editorialPicks[0] || newReleases[0] || movies[0];
+
   return (
     <div className="home-page">
+      {/* Hero Banner */}
+      {featuredMovie && <HeroBanner movie={featuredMovie} />}
+
       {/* Hero Carousel */}
       <HomeHeroCarousel userId={userId} />
 

@@ -2,10 +2,13 @@
 .app-layout {
   min-height: 100vh;
   background: var(--void);
+  padding-top: 0;
 }
 
 .main-content {
   transition: margin-left var(--transition-normal);
+  margin-top: 0;
+  padding-top: 60px;
 }
 
 .main-content.with-sidebar {

@@ -1,0 +1,1 @@
+import{e as r,n as a,o as s}from"./index-73eb6fbb.js";const n=e=>r({queryKey:["movie",e],queryFn:async()=>{if(!e)throw new Error("No id provided");const o=await a(e);return s(o)},enabled:!!e,staleTime:1e3*60*5});export{n as u};

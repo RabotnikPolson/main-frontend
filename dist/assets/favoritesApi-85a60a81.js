@@ -1,0 +1,1 @@
+import{k as a}from"./index-73eb6fbb.js";const o=async t=>(await a.get(`/watchlists/user/${t}`)).data,c=async(t,s)=>(await a.post("/watchlists",{userId:t,movieId:s})).data,n=async(t,s)=>(await a.delete("/watchlists",{params:{userId:t,movieId:s}})).data;export{c as a,o as g,n as r};
